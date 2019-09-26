@@ -3,7 +3,7 @@
 # file, please don't be scared to make it more pleasant / remove hadolint
 # ignores.
 
-FROM golang:1.13 AS builder
+FROM golang:1.13.0 AS builder
 
 ARG VERSION="unknown"
 ENV VERSION=${VERSION}
