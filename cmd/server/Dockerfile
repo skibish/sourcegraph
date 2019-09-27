@@ -1,3 +1,31 @@
+FROM sourcegraph/builder:f58e2e6e12@sha256:decbdd1580ce10d40b10062fd8592a1ab7b357a2e635fe8a26aeee57fdaaba18 as builder
+
+ARG VERSION="unknown"
+
+# Overridable package paths for when this script is called externally by
+# our enterprise build scripts
+ARG FRONTEND_PKG="github.com/sourcegraph/sourcegraph/cmd/frontend"
+ENV FRONTEND_PKG ${FRONTEND_PKG}
+
+ARG MANAGEMENT_CONSOLE_PKG="github.com/sourcegraph/sourcegraph/cmd/management-console"
+ENV MANAGEMENT_CONSOLE_PKG ${MANAGEMENT_CONSOLE_PKG}
+
+ARG REPO_UPDATER_PKG="github.com/sourcegraph/sourcegraph/cmd/repo-updater"
+ENV REPO_UPDATER_PKG ${REPO_UPDATER_PKG}
+
+ARG SERVER_PKG="github.com/sourcegraph/sourcegraph/cmd/server"
+ENV SERVER_PKG ${SERVER_PKG}
+
+ENV OUTPUT_DIR=/output
+RUN mkdir -p ${OUTPUT_DIR}
+
+ARG PRE_BUILD_SCRIPT="cmd/server/pre-build.sh"
+
+WORKDIR /src
+COPY . .
+RUN "./${PRE_BUILD_SCRIPT}"
+RUN ./cmd/server/build.sh
+
 FROM alpine:3.10@sha256:72c42ed48c3a2db31b7dafe17d275b634664a708d901ec9fd57b1529280f01fb AS ctags
 
 # hadolint ignore=DL3003,DL3018,DL4006
@@ -64,9 +92,9 @@ COPY --from=sourcegraph/prometheus:10.0.0@sha256:aca8cf12d41cbf5d8885ed675fa017b
 
 # hadolint ignore=DL3018
 RUN set -ex && \
- addgroup -S grafana && \
- adduser -S -G grafana grafana && \
- apk add --no-cache libc6-compat=1.1.23-r3 ca-certificates su-exec
+    addgroup -S grafana && \
+    adduser -S -G grafana grafana && \
+    apk add --no-cache libc6-compat=1.1.23-r3 ca-certificates su-exec
 
 # hadolint ignore=DL3022
 COPY --from=sourcegraph/grafana:10.0.0@sha256:f84e4260dce4e36f5d5e9c6deb393ac1e9c930ffae622c432fa86640a1f2699f /usr/share/grafana /usr/share/grafana
@@ -74,7 +102,7 @@ COPY --from=sourcegraph/grafana:10.0.0@sha256:f84e4260dce4e36f5d5e9c6deb393ac1e9
 # hadolint ignore=DL3022
 COPY --from=libsqlite3-pcre /sqlite3-pcre/pcre.so /libsqlite3-pcre.so
 ENV LIBSQLITE3_PCRE /libsqlite3-pcre.so
-COPY . /
+COPY --from=builder /output /
 
 RUN echo "hosts: files dns" > /etc/nsswitch.conf
 
