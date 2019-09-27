@@ -5,9 +5,10 @@
 
 FROM sourcegraph/builder:f58e2e6e12@sha256:decbdd1580ce10d40b10062fd8592a1ab7b357a2e635fe8a26aeee57fdaaba18 as builder
 
-RUN ln -s /usr/bin/python2.7 /usr/bin/python
 WORKDIR /src
 COPY . .
+# Set python2.7 as default (for node-sass)
+RUN ln -s /usr/bin/python2.7 /usr/bin/python
 RUN ./cmd/management-console/pre-build.sh
 RUN ./cmd/management-console/build.sh
 
