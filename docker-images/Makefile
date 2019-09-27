@@ -1,4 +1,5 @@
 images += alpine
+images += builder
 
 default:
 	@echo Possible targets: $(images)

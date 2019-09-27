@@ -3,6 +3,14 @@
 # file, please don't be scared to make it more pleasant / remove hadolint
 # ignores.
 
+FROM sourcegraph/builder:f58e2e6e12@sha256:decbdd1580ce10d40b10062fd8592a1ab7b357a2e635fe8a26aeee57fdaaba18 as builder
+
+RUN ln -s /usr/bin/python2.7 /usr/bin/python
+WORKDIR /src
+COPY . .
+RUN ./cmd/management-console/pre-build.sh
+RUN ./cmd/management-console/build.sh
+
 FROM sourcegraph/alpine:3.9@sha256:e9264d4748e16de961a2b973cc12259dee1d33473633beccb1dfb8a0e62c6459
 
 ARG COMMIT_SHA="unknown"
@@ -17,4 +25,4 @@ LABEL com.sourcegraph.github.url=https://github.com/sourcegraph/sourcegraph/comm
 ENV PGDATABASE=sg PGHOST=pgsql PGPORT=5432 PGSSLMODE=disable PGUSER=sg
 USER sourcegraph
 ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/management-console"]
-COPY management-console /usr/local/bin/
+COPY --from=builder /usr/local/bin/management-console /usr/local/bin/
