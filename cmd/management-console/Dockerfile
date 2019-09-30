@@ -5,6 +5,9 @@
 
 FROM sourcegraph/builder:855ef48050@sha256:8ba1aaba452787bb4ee9e02ca5ae7d549c885b07a770be1d645ff7ec0382b122 as builder
 
+ARG VERSION="unknown"
+ENV VERSION ${VERSION}
+
 ARG MANAGEMENT_CONSOLE_PKG="github.com/sourcegraph/sourcegraph/cmd/management-console"
 ENV MANAGEMENT_CONSOLE_PKG ${MANAGEMENT_CONSOLE_PKG}
 

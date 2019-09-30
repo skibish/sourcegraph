@@ -19,6 +19,9 @@ ENV SERVER_PKG ${SERVER_PKG}
 ENV OUTPUT_DIR=/output
 RUN mkdir -p ${OUTPUT_DIR}
 
+ARG VERSION="unknown"
+ENV VERSION ${VERSION}
+
 ARG PRE_BUILD_SCRIPT="cmd/server/pre-build.sh"
 
 # Set the default python version to 2.7

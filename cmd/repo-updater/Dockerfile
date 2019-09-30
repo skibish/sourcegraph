@@ -8,6 +8,9 @@ FROM sourcegraph/builder:855ef48050@sha256:8ba1aaba452787bb4ee9e02ca5ae7d549c885
 ARG REPO_UPDATER_PKG="github.com/sourcegraph/sourcegraph/cmd/repo-updater"
 ENV REPO_UPDATER_PKG ${REPO_UPDATER_PKG}
 
+ARG VERSION="unknown"
+ENV VERSION ${VERSION}
+
 ENV OUTPUT_DIR=/output
 RUN mkdir -p ${OUTPUT_DIR}
 
