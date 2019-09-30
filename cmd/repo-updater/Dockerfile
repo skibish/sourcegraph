@@ -3,6 +3,19 @@
 # file, please don't be scared to make it more pleasant / remove hadolint
 # ignores.
 
+FROM sourcegraph/builder:855ef48050@sha256:8ba1aaba452787bb4ee9e02ca5ae7d549c885b07a770be1d645ff7ec0382b122 as builder
+
+ARG REPO_UPDATER_PKG="github.com/sourcegraph/sourcegraph/cmd/repo-updater"
+ENV REPO_UPDATER_PKG ${REPO_UPDATER_PKG}
+
+ENV OUTPUT_DIR=/output
+RUN mkdir -p ${OUTPUT_DIR}
+
+WORKDIR /src
+COPY . .
+
+RUN ./cmd/repo-updater/build.sh
+
 FROM sourcegraph/alpine:3.9@sha256:e9264d4748e16de961a2b973cc12259dee1d33473633beccb1dfb8a0e62c6459
 
 ARG COMMIT_SHA="unknown"
@@ -16,4 +29,4 @@ LABEL com.sourcegraph.github.url=https://github.com/sourcegraph/sourcegraph/comm
 
 USER sourcegraph
 ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/repo-updater"]
-COPY repo-updater /usr/local/bin/
+COPY --from=builder /output/usr/local/bin/repo-updater /usr/local/bin/
