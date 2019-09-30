@@ -5,14 +5,14 @@
 
 FROM sourcegraph/builder:f58e2e6e12@sha256:decbdd1580ce10d40b10062fd8592a1ab7b357a2e635fe8a26aeee57fdaaba18 as builder
 
-ARG MANAGEMENT_CONSOLE_PACKAGE_PATH="github.com/sourcegraph/sourcegraph/cmd/management-console"
+ARG MANAGEMENT_CONSOLE_PKG="github.com/sourcegraph/sourcegraph/cmd/management-console"
 
 WORKDIR /src
 COPY . .
 # Set python2.7 as default (for node-sass)
 RUN ln -s /usr/bin/python2.7 /usr/bin/python
 RUN ./cmd/management-console/pre-build.sh
-RUN ./cmd/management-console/build.sh ${MANAGEMENT_CONSOLE_PACKAGE_PATH}
+RUN ./cmd/management-console/build.sh ${MANAGEMENT_CONSOLE_PKG}
 
 FROM sourcegraph/alpine:3.9@sha256:e9264d4748e16de961a2b973cc12259dee1d33473633beccb1dfb8a0e62c6459
 

@@ -7,4 +7,4 @@ docker build -f cmd/management-console/Dockerfile -t $IMAGE . \
     --build-arg COMMIT_SHA \
     --build-arg DATE \
     --build-arg VERSION \
-    --build-arg MANAGEMENT_CONSOLE_PACKAGE_PATH
+    --build-arg MANAGEMENT_CONSOLE_PKG
