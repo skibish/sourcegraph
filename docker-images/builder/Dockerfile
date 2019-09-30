@@ -4,14 +4,43 @@ LABEL org.opencontainers.image.url=https://sourcegraph.com/
 LABEL org.opencontainers.image.source=https://github.com/sourcegraph/sourcegraph/
 LABEL org.opencontainers.image.documentation=https://docs.sourcegraph.com/
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+    # For apt-key add
+    gnupg \
     # Python 2 (for management console)
     python2.7 \
+    # For switching to postgres user
+    sudo \
+    # Some of our build scripts use wget
+    wget \
+    lsb-core \
     build-essential \
     make \
     ca-certificates \
     curl && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Postgres
+RUN wget -q -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - && \
+    sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -sc)-pgdg main" > /etc/apt/sources.list.d/PostgreSQL.list' && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+    postgresql-9.6 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+ENV PATH /usr/local/pgsql/bin:$PATH
+
+# Symbols service build tools
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libpcre3-dev \
+    libsqlite3-dev \
+    pkg-config \
+    musl-tools && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

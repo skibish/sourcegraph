@@ -1,4 +1,4 @@
-FROM sourcegraph/builder:f58e2e6e12@sha256:decbdd1580ce10d40b10062fd8592a1ab7b357a2e635fe8a26aeee57fdaaba18 as builder
+FROM sourcegraph/builder:855ef48050@sha256:8ba1aaba452787bb4ee9e02ca5ae7d549c885b07a770be1d645ff7ec0382b122 as builder
 
 ARG VERSION="unknown"
 
@@ -21,9 +21,13 @@ RUN mkdir -p ${OUTPUT_DIR}
 
 ARG PRE_BUILD_SCRIPT="cmd/server/pre-build.sh"
 
+# Set the default python version to 2.7
+# (for the management-console's node-sass depdendency)
+RUN ln -s /usr/bin/python2.7 /usr/bin/python
+
 WORKDIR /src
 COPY . .
-RUN "./${PRE_BUILD_SCRIPT}"
+RUN ${PRE_BUILD_SCRIPT}
 RUN ./cmd/server/build.sh
 
 FROM alpine:3.10@sha256:72c42ed48c3a2db31b7dafe17d275b634664a708d901ec9fd57b1529280f01fb AS ctags

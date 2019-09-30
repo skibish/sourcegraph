@@ -3,14 +3,20 @@
 # file, please don't be scared to make it more pleasant / remove hadolint
 # ignores.
 
-FROM sourcegraph/builder:f58e2e6e12@sha256:decbdd1580ce10d40b10062fd8592a1ab7b357a2e635fe8a26aeee57fdaaba18 as builder
+FROM sourcegraph/builder:855ef48050@sha256:8ba1aaba452787bb4ee9e02ca5ae7d549c885b07a770be1d645ff7ec0382b122 as builder
 
 ARG MANAGEMENT_CONSOLE_PKG="github.com/sourcegraph/sourcegraph/cmd/management-console"
+ENV MANAGEMENT_CONSOLE_PKG ${MANAGEMENT_CONSOLE_PKG}
+
+ENV OUTPUT_DIR=/output
+RUN mkdir -p ${OUTPUT_DIR}
 
 WORKDIR /src
 COPY . .
+
 # Set python2.7 as default (for node-sass)
 RUN ln -s /usr/bin/python2.7 /usr/bin/python
+
 RUN ./cmd/management-console/pre-build.sh
 RUN ./cmd/management-console/build.sh ${MANAGEMENT_CONSOLE_PKG}
 
@@ -28,4 +34,4 @@ LABEL com.sourcegraph.github.url=https://github.com/sourcegraph/sourcegraph/comm
 ENV PGDATABASE=sg PGHOST=pgsql PGPORT=5432 PGSSLMODE=disable PGUSER=sg
 USER sourcegraph
 ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/management-console"]
-COPY --from=builder /usr/local/bin/management-console /usr/local/bin/
+COPY --from=builder /output/usr/local/bin/management-console /usr/local/bin/
