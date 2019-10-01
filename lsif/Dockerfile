@@ -1,4 +1,4 @@
-FROM alpine:3.10@sha256:72c42ed48c3a2db31b7dafe17d275b634664a708d901ec9fd57b1529280f01fb AS builder
+FROM alpine:3.10@sha256:acd3ca9941a85e8ed16515bfc5328e4e2f8c128caa72959a58a127b7801ee01f AS builder
 
 RUN apk add --no-cache nodejs-current=12.4.0-r0 nodejs-npm=10.16.3-r0
 RUN npm install -g yarn@1.17.3
