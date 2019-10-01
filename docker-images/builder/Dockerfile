@@ -4,23 +4,25 @@ LABEL org.opencontainers.image.url=https://sourcegraph.com/
 LABEL org.opencontainers.image.source=https://github.com/sourcegraph/sourcegraph/
 LABEL org.opencontainers.image.documentation=https://docs.sourcegraph.com/
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+    build-essential \
+    ca-certificates \
+    curl  \
     # For apt-key add
     gnupg \
+    lsb-core \
+    make \
     # Python 2 (for management console)
     python2.7 \
     # For switching to postgres user
     sudo \
     # Some of our build scripts use wget
-    wget \
-    lsb-core \
-    build-essential \
-    make \
-    ca-certificates \
-    curl && \
+    wget && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -39,8 +41,8 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libpcre3-dev \
     libsqlite3-dev \
-    pkg-config \
-    musl-tools && \
+    musl-tools \
+    pkg-config && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -66,6 +68,5 @@ ENV GO_VERSION 1.13
 RUN curl -Lfs "https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz" | tar xz && mv go /usr/local
 ENV GOPATH /go
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
-
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 WORKDIR $GOPATH

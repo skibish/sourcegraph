@@ -2,7 +2,7 @@
 
 # We want to build multiple go binaries, so we use a custom build step on CI.
 cd $(dirname "${BASH_SOURCE[0]}")/../..
-set -ex
+set -euxo pipefail
 
 docker build -f cmd/github-proxy/Dockerfile -t $IMAGE . \
     --build-arg COMMIT_SHA \

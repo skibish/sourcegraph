@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # This function installs the Comby dependency for replacer. It is called when
-# this script is called with 'installComby' in the first argument (e.g., by CI).  
+# this script is called with 'installComby' in the first argument (e.g., by CI).
 # If this script is called without arguments, it simply builds replacer.
 function installComby() {
     RELEASE_VERSION="0.7.0"
@@ -98,7 +98,7 @@ fi
 
 # We want to build multiple go binaries, so we use a custom build step on CI.
 cd $(dirname "${BASH_SOURCE[0]}")/../..
-set -ex
+set -euxo pipefail
 
 OUTPUT=`mktemp -d -t sgdockerbuild_XXXXXXX`
 cleanup() {

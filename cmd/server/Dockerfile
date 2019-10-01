@@ -1,7 +1,5 @@
 FROM sourcegraph/builder:855ef48050@sha256:8ba1aaba452787bb4ee9e02ca5ae7d549c885b07a770be1d645ff7ec0382b122 as builder
 
-ARG VERSION="unknown"
-
 # Overridable package paths for when this script is called externally by
 # our enterprise build scripts
 ARG FRONTEND_PKG="github.com/sourcegraph/sourcegraph/cmd/frontend"
@@ -98,7 +96,7 @@ COPY --from=sourcegraph/prometheus:10.0.0@sha256:aca8cf12d41cbf5d8885ed675fa017b
 COPY --from=sourcegraph/prometheus:10.0.0@sha256:aca8cf12d41cbf5d8885ed675fa017b83ad73af96d86bbe5bcead45ca8e958f3 /usr/share/prometheus /usr/share/prometheus
 
 # hadolint ignore=DL3018
-RUN set -ex && \
+RUN set -euxo pipefail && \
     addgroup -S grafana && \
     adduser -S -G grafana grafana && \
     apk add --no-cache libc6-compat=1.1.23-r3 ca-certificates su-exec

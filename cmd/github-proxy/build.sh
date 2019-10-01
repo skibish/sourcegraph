@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 cd $(dirname "${BASH_SOURCE[0]}")/../..
-set -ex
+set -euxo pipefail
 
 # Environment for building linux binaries
 export GO111MODULE=on

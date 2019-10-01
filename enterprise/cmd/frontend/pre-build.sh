@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ex
+set -euxo pipefail
 cd $(dirname "${BASH_SOURCE[0]}")/../..
 
 pushd ..

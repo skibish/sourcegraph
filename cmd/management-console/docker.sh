@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 cd $(dirname "${BASH_SOURCE[0]}")/../..
-set -ex
+set -euxo pipefail
 
 docker build -f cmd/management-console/Dockerfile -t $IMAGE . \
     --build-arg COMMIT_SHA \

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 cd $(dirname "${BASH_SOURCE[0]}")/../../..
-set -ex
+set -euxo pipefail
 
 # Override packages with their "enterprise" counterparts
 export SERVER_PKG=github.com/sourcegraph/sourcegraph/enterprise/cmd/server
