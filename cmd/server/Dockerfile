@@ -1,4 +1,4 @@
-FROM sourcegraph/builder:855ef48050@sha256:8ba1aaba452787bb4ee9e02ca5ae7d549c885b07a770be1d645ff7ec0382b122 as builder
+FROM sourcegraph/builder:a9bc56959f@sha256:25d9a6e484e322e1de6390b1712f9fee255af16c9752c00d14613bf6f50c8f1d as builder
 
 # Overridable package paths for when this script is called externally by
 # our enterprise build scripts
@@ -25,6 +25,11 @@ ARG PRE_BUILD_SCRIPT="cmd/server/pre-build.sh"
 # Set the default python version to 2.7
 # (for the management-console's node-sass depdendency)
 RUN ln -s /usr/bin/python2.7 /usr/bin/python
+
+ENV PGUSER postgres
+ENV PGDATA /var/lib/pgsql/data
+ENV PGDATABASE postgres
+ENV PGSSLMODE disable
 
 WORKDIR /src
 COPY . .

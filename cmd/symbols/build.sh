@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -euxo pipefail
 
 IMAGE="${IMAGE:=dev-symbols}"
 CTAGS_IMAGE="${CTAGS_IMAGE:=ctags}"
@@ -125,16 +125,6 @@ function execute() {
     "$SYMBOLS_EXECUTABLE_OUTPUT_PATH"
 }
 
-# Builds the libsqlite3-pcre Docker image.
-function buildLibsqlite3PcreDockerImage() {
-    EMPTY_DIRECTORY="$(mktemp -d)"
-    trap "rm -rf $EMPTY_DIRECTORY" EXIT
-
-    echo "Building the libsqlite3-pcre Docker image..."
-    docker build --quiet -f cmd/symbols/libsqlite3-pcre/Dockerfile -t "libsqlite3-pcre" "$EMPTY_DIRECTORY"
-    echo "Building the libsqlite3-pcre Docker image... done"
-}
-
 # Builds the Docker images that the symbols Docker image depends on. The caller
 # must set:
 #
@@ -155,40 +145,15 @@ function buildSymbolsDockerImageDependencies() {
     export GOOS=linux
     buildExecutable
 
-    buildCtagsDockerImage
-
-    buildLibsqlite3PcreDockerImage
-
     cp -R cmd/symbols/.ctags.d "$CTAGS_D_OUTPUT_PATH"
 }
 
 # Builds the symbols Docker image.
 function buildSymbolsDockerImage() {
-    symbolsDockerBuildContext="$(mktemp -d)"
-    trap "rm -rf $symbolsDockerBuildContext" EXIT
+    SYMBOLS_EXECUTABLE_OUTPUT_PATH="$OUTPUT_DIR/symbols"
+    CTAGS_D_OUTPUT_PATH="$OUTPUT_DIR/.ctags.d"
 
-    SYMBOLS_EXECUTABLE_OUTPUT_PATH="$symbolsDockerBuildContext/symbols"
-    CTAGS_D_OUTPUT_PATH="$symbolsDockerBuildContext/.ctags.d"
     buildSymbolsDockerImageDependencies
-
-    echo "Building the $IMAGE Docker image..."
-    docker build --quiet -f cmd/symbols/Dockerfile -t "$IMAGE" "$symbolsDockerBuildContext" \
-        --build-arg COMMIT_SHA \
-        --build-arg DATE \
-        --build-arg VERSION
-    echo "Building the $IMAGE Docker image... done"
-}
-
-# Builds the ctags docker image, used by universal-ctags-dev and the symbols Docker image.
-function buildCtagsDockerImage() {
-    ctagsDockerBuildContext="$(mktemp -d)"
-    trap "rm -rf $ctagsDockerBuildContext" EXIT
-
-    cp -R cmd/symbols/.ctags.d "$ctagsDockerBuildContext"
-
-    echo "Building the $CTAGS_IMAGE Docker image..."
-    docker build --quiet -f cmd/symbols/internal/pkg/ctags/Dockerfile -t "$CTAGS_IMAGE" "$ctagsDockerBuildContext"
-    echo "Building the $CTAGS_IMAGE Docker image... done"
 }
 
 command="$1"

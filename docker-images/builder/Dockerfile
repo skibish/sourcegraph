@@ -13,6 +13,7 @@ RUN apt-get update && \
     build-essential \
     ca-certificates \
     curl  \
+    git \
     # For apt-key add
     gnupg \
     lsb-core \
@@ -39,7 +40,9 @@ ENV PATH /usr/local/pgsql/bin:$PATH
 # Symbols service build tools
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+    libjansson-dev \
     libpcre3-dev \
+    libseccomp-dev \
     libsqlite3-dev \
     musl-tools \
     pkg-config && \

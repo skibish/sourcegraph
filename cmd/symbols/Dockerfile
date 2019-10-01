@@ -1,3 +1,23 @@
+FROM sourcegraph/builder:a9bc56959f@sha256:25d9a6e484e322e1de6390b1712f9fee255af16c9752c00d14613bf6f50c8f1d as builder
+
+ENV OUTPUT_DIR=/output
+RUN mkdir -p ${OUTPUT_DIR}
+
+WORKDIR /src
+COPY . .
+
+ARG CTAGS_VERSION="03f933a96d3ef87adbf9d167462d45ce69577edb"
+ENV CTAGS_VERSION ${CTAGS_VERSION}
+
+RUN cmd/symbols/internal/pkg/ctags/build.sh
+
+RUN cmd/symbols/libsqlite3-pcre/build.sh
+
+ARG VERSION="unknown"
+ENV VERSION ${VERSION}
+
+RUN cmd/symbols/build.sh buildSymbolsDockerImage
+
 FROM alpine:3.9@sha256:644fcb1a676b5165371437feaa922943aaf7afcfa8bfee4472f6860aad1ef2a0
 
 ARG COMMIT_SHA="unknown"
@@ -13,10 +33,10 @@ LABEL com.sourcegraph.github.url=https://github.com/sourcegraph/sourcegraph/comm
 RUN apk add --no-cache bind-tools ca-certificates mailcap tini
 
 # hadolint ignore=DL3022
-COPY --from=ctags /usr/local/bin/universal-* /usr/local/bin/
+COPY --from=builder /output/bin/universal-* /usr/local/bin/
 
 # hadolint ignore=DL3022
-COPY --from=libsqlite3-pcre /sqlite3-pcre/pcre.so /libsqlite3-pcre.so
+COPY --from=builder /output/pcre.so /libsqlite3-pcre.so
 ENV LIBSQLITE3_PCRE /libsqlite3-pcre.so
 # hadolint ignore=DL3018
 RUN apk --no-cache add pcre-dev
@@ -28,9 +48,9 @@ RUN apk --no-cache add pcre-dev
 # initialization:
 # https://github.com/universal-ctags/ctags/blob/1b747b38589f7a1c98ac9fe0a0b8b174dd476050/docs/optlib.rst#preload-option-file
 WORKDIR /
-COPY .ctags.d /.ctags.d
+COPY cmd/symbols/.ctags.d /.ctags.d
 
 ENV CACHE_DIR=/mnt/cache/symbols
 EXPOSE 3184
 ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/symbols"]
-COPY symbols /usr/local/bin/
+COPY --from=builder /output/symbols /usr/local/bin/
