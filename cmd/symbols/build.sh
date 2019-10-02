@@ -2,8 +2,6 @@
 
 set -euxo pipefail
 
-IMAGE="${IMAGE:=dev-symbols}"
-CTAGS_IMAGE="${CTAGS_IMAGE:=ctags}"
 BUILD_TYPE="${BUILD_TYPE:=dev}"
 
 repositoryRoot="$PWD"

@@ -9,6 +9,9 @@ COPY . .
 ARG CTAGS_VERSION="03f933a96d3ef87adbf9d167462d45ce69577edb"
 ENV CTAGS_VERSION ${CTAGS_VERSION}
 
+ARG BUILD_TYPE="dev"
+ENV BUILD_TYPE ${BUILD_TYPE}
+
 RUN cmd/symbols/internal/pkg/ctags/build.sh
 
 RUN cmd/symbols/libsqlite3-pcre/build.sh

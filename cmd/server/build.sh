@@ -39,9 +39,6 @@ done
 echo "--- build sqlite for symbols"
 env CTAGS_D_OUTPUT_PATH="$OUTPUT_DIR/.ctags.d" SYMBOLS_EXECUTABLE_OUTPUT_PATH="$bindir/symbols" BUILD_TYPE=dist ./cmd/symbols/build.sh buildSymbolsDockerImageDependencies
 
-echo "--- build lsif-server"
-IMAGE=sourcegraph/lsif-server:ci ./lsif/build.sh
-
 echo "--- prometheus config"
 cp -r docker-images/prometheus/config "$OUTPUT_DIR/sg_config_prometheus"
 mkdir "$OUTPUT_DIR/sg_prometheus_add_ons"
