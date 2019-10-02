@@ -4,7 +4,7 @@ cd $(dirname "${BASH_SOURCE[0]}")/../..
 
 # Build the webapp typescript code.
 echo "--- yarn"
-[[ -z "${CI}" ]] && yarn || yarn --frozen-lockfile --network-timeout 60000
+yarn --frozen-lockfile --network-timeout 60000
 
 pushd web
 echo "--- yarn run build"
