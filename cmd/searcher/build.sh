@@ -10,6 +10,7 @@ export GOARCH=amd64
 export GOOS=linux
 export CGO_ENABLED=0
 
+echo "--- go build"
 for pkg in github.com/sourcegraph/sourcegraph/cmd/searcher; do
     go build -ldflags "-X github.com/sourcegraph/sourcegraph/pkg/version.version=$VERSION" -buildmode exe -tags dist -o $OUTPUT_DIR/$(basename $pkg) $pkg
 done
