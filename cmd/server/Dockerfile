@@ -14,14 +14,14 @@ ENV REPO_UPDATER_PKG ${REPO_UPDATER_PKG}
 ARG SERVER_PKG="github.com/sourcegraph/sourcegraph/cmd/server"
 ENV SERVER_PKG ${SERVER_PKG}
 
-ENV OUTPUT_DIR=/output
-RUN mkdir -p ${OUTPUT_DIR}
-
 ARG CTAGS_VERSION="03f933a96d3ef87adbf9d167462d45ce69577edb"
 ENV CTAGS_VERSION ${CTAGS_VERSION}
 
 ARG VERSION="unknown"
 ENV VERSION ${VERSION}
+
+ENV OUTPUT_DIR=/output
+RUN mkdir -p ${OUTPUT_DIR}
 
 ARG PRE_BUILD_SCRIPT="cmd/server/pre-build.sh"
 

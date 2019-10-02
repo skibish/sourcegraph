@@ -16,4 +16,3 @@ export CGO_ENABLED=0
 for pkg in $MANAGEMENT_CONSOLE_PKG; do
     go build -ldflags "-X github.com/sourcegraph/sourcegraph/pkg/version.version=$VERSION" -buildmode exe -tags dist -o "$bindir/$(basename "$pkg")" $pkg
 done
-

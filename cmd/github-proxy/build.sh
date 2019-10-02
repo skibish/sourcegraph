@@ -10,6 +10,6 @@ export GOOS=linux
 export CGO_ENABLED=0
 
 for pkg in github.com/sourcegraph/sourcegraph/cmd/github-proxy; do
-    go build -ldflags "-X github.com/sourcegraph/sourcegraph/pkg/version.version=$VERSION" -buildmode exe -tags dist -o /usr/local/bin/$(basename $pkg) $pkg
+    go build -ldflags "-X github.com/sourcegraph/sourcegraph/pkg/version.version=$VERSION" -buildmode exe -tags dist -o $OUTPUT_DIR/$(basename $pkg) $pkg
 done
 

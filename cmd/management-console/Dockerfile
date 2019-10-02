@@ -1,8 +1,3 @@
-# This Dockerfile was generated from github.com/sourcegraph/godockerize. It
-# was not written by a human, and as such looks janky. As you change this
-# file, please don't be scared to make it more pleasant / remove hadolint
-# ignores.
-
 FROM sourcegraph/builder:a9bc56959f@sha256:25d9a6e484e322e1de6390b1712f9fee255af16c9752c00d14613bf6f50c8f1d as builder
 
 ARG VERSION="unknown"
@@ -21,7 +16,7 @@ COPY . .
 RUN ln -s /usr/bin/python2.7 /usr/bin/python
 
 RUN ./cmd/management-console/pre-build.sh
-RUN ./cmd/management-console/build.sh ${MANAGEMENT_CONSOLE_PKG}
+RUN ./cmd/management-console/build.sh
 
 FROM sourcegraph/alpine:3.9@sha256:e9264d4748e16de961a2b973cc12259dee1d33473633beccb1dfb8a0e62c6459
 

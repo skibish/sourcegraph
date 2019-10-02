@@ -1,8 +1,3 @@
-# This Dockerfile was generated from github.com/sourcegraph/godockerize. It
-# was not written by a human, and as such looks janky. As you change this
-# file, please don't be scared to make it more pleasant / remove hadolint
-# ignores.
-
 FROM sourcegraph/builder:a9bc56959f@sha256:25d9a6e484e322e1de6390b1712f9fee255af16c9752c00d14613bf6f50c8f1d as builder
 
 ARG REPO_UPDATER_PKG="github.com/sourcegraph/sourcegraph/cmd/repo-updater"
@@ -32,4 +27,4 @@ LABEL com.sourcegraph.github.url=https://github.com/sourcegraph/sourcegraph/comm
 
 USER sourcegraph
 ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/repo-updater"]
-COPY --from=builder /output/usr/local/bin/repo-updater /usr/local/bin/
+COPY --from=builder /output/repo-updater /usr/local/bin/

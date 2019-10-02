@@ -1,16 +1,14 @@
-# This Dockerfile was generated from github.com/sourcegraph/godockerize. It
-# was not written by a human, and as such looks janky. As you change this
-# file, please don't be scared to make it more pleasant / remove hadolint
-# ignores.
-
-FROM golang:1.13.0@sha256:90d554b5ae59cb63d2bf42bdfcd60aa1feb4794d9e3a9cbb9d2deb477c088be0 AS builder
+FROM sourcegraph/builder:a9bc56959f@sha256:25d9a6e484e322e1de6390b1712f9fee255af16c9752c00d14613bf6f50c8f1d as builder
 
 ARG VERSION="unknown"
-ENV VERSION=${VERSION}
+ENV VERSION ${VERSION}
+
+ENV OUTPUT_DIR=/output
+RUN mkdir -p ${OUTPUT_DIR}
 
 WORKDIR /src
-
 COPY . .
+
 RUN ./cmd/github-proxy/build.sh
 
 FROM sourcegraph/alpine:3.9@sha256:e9264d4748e16de961a2b973cc12259dee1d33473633beccb1dfb8a0e62c6459
@@ -27,4 +25,4 @@ LABEL com.sourcegraph.github.url=https://github.com/sourcegraph/sourcegraph/comm
 ENV LOG_REQUEST=true
 USER sourcegraph
 ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/github-proxy"]
-COPY --from=builder /usr/local/bin/github-proxy /usr/local/bin/
+COPY --from=builder /output/github-proxy /usr/local/bin/

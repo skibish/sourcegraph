@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 
-# We want to build multiple go binaries, so we use a custom build step on CI.
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 set -euxo pipefail
 
-echo "--- docker build"
 docker build -f cmd/server/Dockerfile -t "$IMAGE" . \
     --build-arg COMMIT_SHA \
     --build-arg DATE \
