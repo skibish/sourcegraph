@@ -198,10 +198,9 @@ func addServerDockerImageCandidate(c Config) func(*bk.Pipeline) {
 	return func(pipeline *bk.Pipeline) {
 		pipeline.AddStep(":docker:",
 			bk.Cmd("pushd enterprise"),
-			bk.Cmd("./cmd/server/pre-build.sh"),
 			bk.Env("IMAGE", "sourcegraph/server:"+c.version+"_candidate"),
 			bk.Env("VERSION", c.version),
-			bk.Cmd("./cmd/server/build.sh"),
+			bk.Cmd("./cmd/server/docker.sh"),
 			bk.Cmd("popd"))
 	}
 }
@@ -249,6 +248,8 @@ func addDockerImage(c Config, app string, insiders bool) func(*bk.Pipeline) {
 	return func(pipeline *bk.Pipeline) {
 		cmds := []bk.StepOpt{
 			bk.Cmd(fmt.Sprintf(`echo "Building %s..."`, app)),
+			// TODO@ggilmore: 🚨 This is a shim to make builds faster, remove before merging 🚨
+			bk.Env("DOCKER_BUILDKIT", "1"),
 		}
 
 		cmdDir := func() string {
@@ -265,16 +266,11 @@ func addDockerImage(c Config, app string, insiders bool) func(*bk.Pipeline) {
 			return "enterprise/cmd/" + app
 		}()
 
-		preBuildScript := cmdDir + "/pre-build.sh"
-		if _, err := os.Stat(preBuildScript); err == nil {
-			cmds = append(cmds, bk.Cmd(preBuildScript))
-		}
-
 		baseImage := "sourcegraph/" + app
 
 		getBuildScript := func() string {
 			buildScriptByApp := map[string]string{
-				"symbols": "env BUILD_TYPE=dist ./cmd/symbols/build.sh buildSymbolsDockerImage",
+				"symbols": "env BUILD_TYPE=dist ./cmd/symbols/docker.sh",
 
 				// The server image was built prior to e2e tests in a previous step.
 				"server": fmt.Sprintf("docker tag %s:%s_candidate %s:%s", baseImage, c.version, baseImage, c.version),
@@ -282,7 +278,7 @@ func addDockerImage(c Config, app string, insiders bool) func(*bk.Pipeline) {
 			if buildScript, ok := buildScriptByApp[app]; ok {
 				return buildScript
 			}
-			return cmdDir + "/build.sh"
+			return cmdDir + "/docker.sh"
 		}
 
 		cmds = append(cmds,
