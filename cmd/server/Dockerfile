@@ -37,6 +37,8 @@ ENV PGSSLMODE disable
 WORKDIR /src
 COPY . .
 
+RUN find .
+
 RUN cmd/symbols/internal/pkg/ctags/build.sh
 
 RUN cmd/symbols/libsqlite3-pcre/build.sh
