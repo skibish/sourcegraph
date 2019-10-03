@@ -38,7 +38,10 @@ steps:
       - "--build-arg"
       - "CTAGS_VERSION=${_CTAGS_VERSION}"
   - name: "gcr.io/cloud-builders/docker"
-    args: ["push", "${_IMAGE}"]
+    args:
+      - "push"
+      - "${_IMAGE}"
+
 timeout: 900s
 options:
   machineType: "N1_HIGHCPU_8"
