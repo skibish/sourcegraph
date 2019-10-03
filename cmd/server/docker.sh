@@ -31,7 +31,7 @@ else
     build_arg_str=""
     for arg in "${BUILD_ARGS[@]}"; do
         if [[ "${!arg}" ]]; then
-            build_arg_str+="--build-arg ${arg}=${!arg}"
+            build_arg_str+="--build-arg ${arg}=${!arg} "
         fi
     done
 
