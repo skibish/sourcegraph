@@ -8,20 +8,16 @@ steps:
         mkdir sourcegraph &&
         curl -L https://github.com/sourcegraph/sourcegraph/archive/${_COMMIT_SHA}.tar.gz | tar xz -C sourcegraph --strip-components 1
 
-  - name: "gcr.io/cloud-builders/docker"
-    env:
-      - "DOCKER_BUILDKIT=1"
+  - name: "gcr.io/kaniko-project/executor:latest"
     dir: sourcegraph
     args:
-      - "build"
+      - "--dockerfile=cmd/server/Dockerfile"
 
-      - "-f"
-      - "cmd/server/Dockerfile"
+      - "--destination=${_IMAGE}"
+      # TODO@ggilmore: remember to remove
+      - "--no-push"
 
-      - "-t"
-      - "${_IMAGE}"
-
-      - "."
+      - "--context=dir://."
 
       - "--build-arg"
       - "COMMIT_SHA=${_COMMIT_SHA}"
