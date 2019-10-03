@@ -37,6 +37,7 @@ ENV PGSSLMODE disable
 WORKDIR /src
 COPY . .
 
+RUN ls -la shared/node_modules/.bin
 RUN find .
 
 RUN cmd/symbols/internal/pkg/ctags/build.sh
