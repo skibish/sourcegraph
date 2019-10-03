@@ -4,13 +4,13 @@ cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 set -exo pipefail
 
 BUILD_ARGS=(
-    # "DATE",
-    "VERSION",
-    "COMMIT_SHA",
-    "FRONTEND_PKG",
-    "REPO_UPDATER_PKG",
-    "SERVER_PKG",
-    "PRE_BUILD_SCRIPT",
+    "DATE"
+    "VERSION"
+    "COMMIT_SHA"
+    "FRONTEND_PKG"
+    "REPO_UPDATER_PKG"
+    "SERVER_PKG"
+    "PRE_BUILD_SCRIPT"
     "CTAGS_VERSION"
 )
 
