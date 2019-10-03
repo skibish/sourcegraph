@@ -1,16 +1,12 @@
 steps:
-  - name: "gcr.io/cloud-builders/git"
+  - name: "gcr.io/cloud-builders/curl"
     entrypoint: /bin/bash
     args:
       - -c
       - |
-        # Read environment variables from disk
+        set -euxo pipefail &&
         mkdir sourcegraph &&
-        cd sourcegraph &&
-        git init &&
-        git remote add origin "git@github.com:sourcegraph/sourcegraph.git" &&
-        git fetch --depth 1 origin ${_COMMIT_SHA} &&
-        git checkout FETCH_HEAD
+        curl -L https://github.com/sourcegraph/sourcegraph/archive/${_COMMIT_SHA}.tar.gz | tar xz -C sourcegraph --strip-components 1
 
   - name: "gcr.io/cloud-builders/docker"
     dir: sourcegraph
