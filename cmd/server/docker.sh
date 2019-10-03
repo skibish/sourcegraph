@@ -1,15 +1,39 @@
 #!/usr/bin/env bash
 
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
-set -euxo pipefail
+set -exo pipefail
 
-docker build -f cmd/server/Dockerfile -t "$IMAGE" . \
-    --build-arg COMMIT_SHA \
-    --build-arg DATE \
-    --build-arg VERSION \
-    --build-arg FRONTEND_PKG \
-    --build-arg MANAGEMENT_CONSOLE_PKG \
-    --build-arg REPO_UPDATER_PKG \
-    --build-arg SERVER_PKG \
-    --build-arg PRE_BUILD_SCRIPT \
-    --build-arg CTAGS_VERSION
+BUILD_ARGS=(
+    "DATE",
+    "VERSION",
+    "COMMIT_SHA",
+    "FRONTEND_PKG",
+    "REPO_UPDATER_PKG",
+    "SERVER_PKG",
+    "PRE_BUILD_SCRIPT",
+    "CTAGS_VERSION"
+)
+
+if [[ "$CI" == "true" ]]; then
+
+    substitutions="_IMAGE=$IMAGE"
+    for arg in "${BUILD_ARGS[@]}"; do
+        if [[ ${!arg} ]]; then
+            substitutions+=",_${arg}=${!arg}"
+        fi
+    done
+
+    gcloud builds submit config=cmd/server/cloudbuild.yaml . \
+        --substitutions=$substitutions
+else
+
+    build_arg_str=""
+    for arg in "${BUILD_ARGS[@]}"; do
+        if [[ ${!arg} ]]; then
+            build_arg_str+="--build-arg ${arg}=${!arg}"
+        fi
+    done
+
+    docker build -f cmd/server/Dockerfile -t "$IMAGE" . \
+        $build_arg_str
+fi
