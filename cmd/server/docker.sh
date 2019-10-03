@@ -18,7 +18,7 @@ if [[ "$CI" == "true" ]]; then
 
     substitutions="_IMAGE=$IMAGE"
     for arg in "${BUILD_ARGS[@]}"; do
-        if [[ ${!arg} ]]; then
+        if [[ "${!arg}" ]]; then
             substitutions+=",_${arg}=${!arg}"
         fi
     done
@@ -29,7 +29,7 @@ else
 
     build_arg_str=""
     for arg in "${BUILD_ARGS[@]}"; do
-        if [[ ${!arg} ]]; then
+        if [[ "${!arg}" ]]; then
             build_arg_str+="--build-arg ${arg}=${!arg}"
         fi
     done
