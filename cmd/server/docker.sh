@@ -5,6 +5,7 @@ set -exo pipefail
 
 BUILD_ARGS=(
     "DATE"
+    "COMMIT_SHA"
     "VERSION"
     "FRONTEND_PKG"
     "REPO_UPDATER_PKG"
@@ -15,7 +16,7 @@ BUILD_ARGS=(
 
 if [[ "$CI" == "true" ]]; then
 
-    substitutions="_IMAGE=$IMAGE,COMMIT_SHA=$COMMIT_SHA"
+    substitutions="_IMAGE=$IMAGE"
     for arg in "${BUILD_ARGS[@]}"; do
         if [[ "${!arg}" ]]; then
             substitutions+=",_${arg}=${!arg}"
@@ -35,6 +36,5 @@ else
     done
 
     docker build -f cmd/server/Dockerfile -t "$IMAGE" . \
-        --build-arg COMMIT_SHA \
         $build_arg_str
 fi

@@ -12,7 +12,7 @@ steps:
           - "../.."
 
           - "--build-arg"
-          - "COMMIT_SHA=${COMMIT_SHA}"
+          - "COMMIT_SHA=${_COMMIT_SHA}"
 
           - "--build-arg"
           - "DATE=${_DATE}"
@@ -44,11 +44,12 @@ options:
     machineType: "N1_HIGHCPU_8"
 substitutions:
     "_IMAGE": "index.docker.io/sourcegraph/server:latest"
+    "_COMMIT_SHA": "unknown"
     "_DATE": "unknown"
     "_VERSION": "unknown"
     "_FRONTEND_PKG": "github.com/sourcegraph/sourcegraph/cmd/frontend"
     "_MANAGEMENT_CONSOLE_PKG": "github.com/sourcegraph/sourcegraph/cmd/management-console"
     "_REPO_UPDATER_PKG": "github.com/sourcegraph/sourcegraph/cmd/repo-updater"
     "_SERVER_PKG": "github.com/sourcegraph/sourcegraph/cmd/server"
-    "_PRE_BUIlD_SCRIPT": "cmd/server/pre-build.sh"
+    "_PRE_BUILD_SCRIPT": "cmd/server/pre-build.sh"
     "_CTAGS_VERSION": "03f933a96d3ef87adbf9d167462d45ce69577edb"
