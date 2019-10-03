@@ -24,7 +24,7 @@ if [[ "$CI" == "true" ]]; then
     done
 
     gcloud builds submit config=cmd/server/cloudbuild.yaml \
-        --substitutions=$substitutions $(pwd)
+        --substitutions=$substitutions
 else
 
     build_arg_str=""
