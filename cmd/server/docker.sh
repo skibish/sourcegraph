@@ -23,7 +23,8 @@ if [[ "$CI" == "true" ]]; then
         fi
     done
 
-    gcloud builds submit config=cmd/server/cloudbuild.yaml \
+    gcloud builds submit \
+        --config=cmd/server/cloudbuild.yaml \
         --substitutions=$substitutions
 else
 
