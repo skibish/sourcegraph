@@ -15,8 +15,7 @@ BUILD_ARGS=(
     "CTAGS_VERSION"
 )
 
-# if [[ "$CI" == "true" ]]; then
-if [[ false ]]; then
+if [[ "false" == "true" ]]; then
 
     substitutions="_IMAGE=$IMAGE"
     for arg in "${BUILD_ARGS[@]}"; do
