@@ -15,9 +15,8 @@ BUILD_ARGS=(
     "CTAGS_VERSION"
 )
 
-ls -la shared/node_modules/.bin
-
-if [[ "$CI" == "true" ]]; then
+# if [[ "$CI" == "true" ]]; then
+if [[ false ]]; then
 
     substitutions="_IMAGE=$IMAGE"
     for arg in "${BUILD_ARGS[@]}"; do

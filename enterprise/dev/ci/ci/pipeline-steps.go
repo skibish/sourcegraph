@@ -200,6 +200,8 @@ func addServerDockerImageCandidate(c Config) func(*bk.Pipeline) {
 			bk.Cmd("pushd enterprise"),
 			bk.Env("IMAGE", "sourcegraph/server:"+c.version+"_candidate"),
 			bk.Env("VERSION", c.version),
+			// TODO@ggilmore: 🚨 This is a shim to make builds faster, remove before merging 🚨
+			bk.Env("DOCKER_BUILDKIT", "1"),
 			bk.Cmd("./cmd/server/docker.sh"),
 			bk.Cmd("popd"))
 	}
