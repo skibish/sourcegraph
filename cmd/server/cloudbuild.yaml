@@ -8,7 +8,7 @@ steps:
         mkdir sourcegraph &&
         curl -L https://github.com/sourcegraph/sourcegraph/archive/${_COMMIT_SHA}.tar.gz | tar xz -C sourcegraph --strip-components 1
 
-  - name: "gcr.io/cloud-builders/docker:latest"
+  - name: "docker:19.03.2"
     dir: "sourcegraph"
     env:
       - "DOCKER_BUILDKIT=1"
