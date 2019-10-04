@@ -9,15 +9,14 @@ steps:
         curl -L https://github.com/sourcegraph/sourcegraph/archive/${_COMMIT_SHA}.tar.gz | tar xz -C sourcegraph --strip-components 1
 
   - name: "gcr.io/kaniko-project/executor:latest"
-    dir: sourcegraph
     args:
-      - "--dockerfile=cmd/server/Dockerfile"
+      - "--dockerfile=sourcegraph/cmd/server/Dockerfile"
 
       - "--destination=${_IMAGE}"
       # TODO@ggilmore: remember to remove
       - "--no-push"
 
-      - "--context=dir://."
+      - "--context=dir://workspace/sourcegraph"
 
       - "--build-arg"
       - "COMMIT_SHA=${_COMMIT_SHA}"
