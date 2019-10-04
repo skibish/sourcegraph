@@ -14,11 +14,10 @@ steps:
       - "DOCKER_BUILDKIT=1"
     args:
       - "build"
+      - "--pull"
 
       - "--file=cmd/server/Dockerfile"
-
       - "--tag=${_IMAGE}"
-
       - "."
 
       - "--build-arg"
