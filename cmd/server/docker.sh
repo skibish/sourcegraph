@@ -35,5 +35,7 @@ else
     done
 
     docker build -f cmd/server/Dockerfile -t "$IMAGE" . \
-        $build_arg_str
+        $build_arg_str \
+        --progress=plain
+
 fi
