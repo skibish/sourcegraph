@@ -1,4 +1,4 @@
-FROM sourcegraph/builder:a9bc56959f@sha256:25d9a6e484e322e1de6390b1712f9fee255af16c9752c00d14613bf6f50c8f1d as builder
+FROM sourcegraph/builder:475db17a4b@sha256:79b1b11d7f622bf4e35979254348163bc2e7dc4353e7103aa23f7e1c46ea56a4 as builder
 
 ARG REPO_UPDATER_PKG="github.com/sourcegraph/sourcegraph/cmd/repo-updater"
 ENV REPO_UPDATER_PKG ${REPO_UPDATER_PKG}

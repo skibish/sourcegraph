@@ -18,6 +18,7 @@ RUN apt-get update && \
     gnupg \
     lsb-core \
     make \
+    parallel \
     # Python 2 (for management console)
     python2.7 \
     # For switching to postgres user
