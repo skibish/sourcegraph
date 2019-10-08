@@ -40,7 +40,7 @@ BUILD_COMMAND="go build \
 
 parallel $BUILD_COMMAND:::"${PACKAGES[@]}"
 
-echo "--- build sqlite for symbols"
+echo "--- build symbols dependencies"
 env CTAGS_D_OUTPUT_PATH="$OUTPUT_DIR/.ctags.d" SYMBOLS_EXECUTABLE_OUTPUT_PATH="$bindir/symbols" BUILD_TYPE=dist ./cmd/symbols/build.sh buildSymbolsDockerImageDependencies
 
 echo "--- prometheus config"

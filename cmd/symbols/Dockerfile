@@ -12,10 +12,6 @@ ENV CTAGS_VERSION ${CTAGS_VERSION}
 ARG BUILD_TYPE="dev"
 ENV BUILD_TYPE ${BUILD_TYPE}
 
-RUN cmd/symbols/internal/pkg/ctags/build.sh
-
-RUN cmd/symbols/libsqlite3-pcre/build.sh
-
 ARG VERSION="unknown"
 ENV VERSION ${VERSION}
 

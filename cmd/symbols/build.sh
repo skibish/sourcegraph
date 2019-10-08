@@ -141,6 +141,11 @@ function buildSymbolsDockerImageDependencies() {
     export GO111MODULE=on
     export GOARCH=amd64
     export GOOS=linux
+
+    ( ./cmd/symbols/internal/pkg/ctags/build.sh ) &
+    ( ./cmd/symbols/libsqlite3-pcre/build.sh ) &
+    wait
+
     buildExecutable
 
     cp -R cmd/symbols/.ctags.d "$CTAGS_D_OUTPUT_PATH"
