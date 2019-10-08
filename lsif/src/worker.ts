@@ -9,7 +9,7 @@ import { convertLsif } from './importer'
 import { createDatabaseFilename, ensureDirectory, readEnvInt } from './util'
 import { createLogger } from './logging'
 import { createPostgresConnection } from './connection'
-import { JobsHash, Worker } from 'node-resque'
+import { JobsHash, Worker as ResqueWorker } from 'node-resque'
 import { Logger } from 'winston'
 import { XrepoDatabase } from './xrepo'
 import { Tracer, FORMAT_TEXT_MAP, Span } from 'opentracing'
@@ -17,6 +17,7 @@ import { MonitoringContext, monitor } from './monitoring'
 import { createTracer } from './tracing'
 import { waitForConfiguration, ConfigurationFetcher } from './config'
 import { discoverAndUpdateCommit } from './commits'
+import { Worker, rewriteJobMeta } from './queue'
 
 /**
  * Which port to run the worker metrics server on. Defaults to 3187.
@@ -189,17 +190,15 @@ async function startWorker(
         jobs[key] = { perform: jobFunctions[key] }
     }
 
-    const formatJob = (job: any): any => ({ class: job.class, args: job.args[0] })
-
     // Create worker and log the interesting events
-    const worker = new Worker({ connection: connectionOptions, queues: ['lsif'] }, jobs)
+    const worker = new ResqueWorker({ connection: connectionOptions, queues: ['lsif'] }, jobs) as Worker
     worker.on('start', () => logger.debug('worker started'))
     worker.on('end', () => logger.debug('worker ended'))
     worker.on('poll', () => logger.debug('worker polling queue'))
     worker.on('ping', () => logger.debug('worker pinging queue'))
-    worker.on('job', (_, job) => logger.debug('worker accepted job', { job: formatJob(job) }))
-    worker.on('success', (_, job, result) => logger.debug('worker completed job', { job: formatJob(job), result }))
-    worker.on('failure', (_, job, failure) => logger.debug('worker failed job', { job: formatJob(job), failure }))
+    worker.on('job', (_, job) => logger.debug('worker accepted job', { job: rewriteJobMeta(job) }))
+    worker.on('success', (_, job, result) => logger.debug('worker completed job', { job: rewriteJobMeta(job), result }))
+    worker.on('failure', (_, job, failure) => logger.debug('worker failed job', { job: rewriteJobMeta(job), failure }))
     worker.on('cleaning_worker', (worker, pid) =>
         logger.debug('worker cleaning old sibling', { worker: `${worker}:${pid}` })
     )
