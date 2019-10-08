@@ -14,7 +14,7 @@ popd
 pushd web/
 
 echo "--- yarn install web"
-yarn --mutex network network install
+yarn --mutex network install
 
 echo "-- yarn build web"
 yarn run build
