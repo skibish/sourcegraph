@@ -4,7 +4,7 @@ set -exo pipefail
 cd $(dirname "${BASH_SOURCE[0]}")/../../..
 
 echo "--- yarn root"
-yarn --frozen-lockfile --network-timeout 60000
+yarn --mutex network --frozen-lockfile --network-timeout 60000
 
 NODE_ENV=${NODE_ENV:-production}
 TARGETS=${TARGETS:-phabricator}

@@ -7,14 +7,14 @@ set -euxo pipefail
 pushd ../..
 
 echo "--- go build"
-yarn install
+yarn --mutex network install
 
 popd
 
 pushd web/
 
 echo "--- yarn install web"
-yarn install
+yarn --mutex network network install
 
 echo "-- yarn build web"
 yarn run build
