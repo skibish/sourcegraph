@@ -3,6 +3,7 @@ import * as path from 'path'
 import bodyParser from 'body-parser'
 import exitHook from 'async-exit-hook'
 import express from 'express'
+import paginate from 'express-paginate'
 import promBundle from 'express-prom-bundle'
 import uuid from 'uuid'
 import { ConnectionCache, DocumentCache, ResultChunkCache } from './cache'
@@ -17,7 +18,7 @@ import { logger as loggingMiddleware } from 'express-winston'
 import { Logger } from 'winston'
 import { pipeline as _pipeline, Readable } from 'stream'
 import { promisify } from 'util'
-import { Queue, Scheduler } from 'node-resque'
+import { Queue as ResqueQueue, Scheduler } from 'node-resque'
 import { readGzippedJsonElements, stringifyJsonLines, validateLsifElements } from './input'
 import { wrap } from 'async-middleware'
 import { XrepoDatabase } from './xrepo'
@@ -27,7 +28,7 @@ import { default as tracingMiddleware } from 'express-opentracing'
 import { waitForConfiguration, ConfigurationFetcher } from './config'
 import { createTracer } from './tracing'
 import { createLogger } from './logging'
-import { enqueue } from './queue'
+import { enqueue, Queue, rewriteJobMeta, WorkerMeta, FailedJobMeta, clearFailed } from './queue'
 
 const pipeline = promisify(_pipeline)
 
@@ -35,6 +36,16 @@ const pipeline = promisify(_pipeline)
  * Which port to run the LSIF server on. Defaults to 3186.
  */
 const HTTP_PORT = readEnvInt('HTTP_PORT', 3186)
+
+/**
+ * The default number of jobs to return per page from queue endpoints.
+ */
+const JOB_PAGE_LIMIT = readEnvInt('JOB_PAGE_LIMIT', 25)
+
+/**
+ * The maximum number of jobs to return per page from queue endpoints.
+ */
+const JOB_PAGE_MAX_LIMIT = readEnvInt('JOB_PAGE_MAX_LIMIT', 100)
 
 /**
  * The host and port running the redis instance containing work queues.
@@ -151,6 +162,7 @@ async function main(logger: Logger): Promise<void> {
     // Register endpoints
     app.use(metaEndpoints())
     app.use(await lsifEndpoints(queue, fetchConfiguration, logger))
+    app.use(queueEndpoints(queue))
 
     // Error handler must be registered last
     app.use(errorHandler(logger))
@@ -177,7 +189,7 @@ async function setupQueue(logger: Logger): Promise<Queue> {
     }
 
     // Create queue and log the interesting events
-    const queue = new Queue({ connection: connectionOptions })
+    const queue = new ResqueQueue({ connection: connectionOptions }) as Queue
     queue.on('error', error => logger.error('queue error', { error }))
     await queue.connect()
     exitHook(() => queue.end())
@@ -388,6 +400,76 @@ async function lsifEndpoints(
                 }
 
                 res.json(await db[cleanMethod](path, position, ctx))
+            }
+        )
+    )
+
+    return router
+}
+
+/**
+ * Add endpoints to the HTTP API to view/control the worker queue.
+ *
+ * @param queue The queue containing LSIF jobs.
+ */
+function queueEndpoints(queue: Queue): express.Router {
+    const router = express.Router()
+
+    router.get(
+        '/active',
+        wrap(
+            async (req: express.Request, res: express.Response): Promise<void> => {
+                const formatWorkerMeta = (job: WorkerMeta): { [K: string]: any } => ({
+                    started_at: new Date(job.run_at).toISOString(),
+                    ...rewriteJobMeta(job.payload),
+                })
+
+                const allJobs = Array.from(Object.values(await queue.allWorkingOn()))
+                const workerMeta = allJobs.filter((x): x is WorkerMeta => x !== 'started')
+                workerMeta.sort((a, b) => a.run_at.localeCompare(b.run_at))
+                res.send(workerMeta.map(formatWorkerMeta))
+            }
+        )
+    )
+
+    router.get(
+        '/clear',
+        wrap(
+            async (req: express.Request, res: express.Response): Promise<void> => {
+                await clearFailed(queue)
+                res.send({})
+            }
+        )
+    )
+
+    // The remaining routes are paginated
+    router.use(paginate.middleware(JOB_PAGE_LIMIT, JOB_PAGE_MAX_LIMIT))
+
+    router.get(
+        '/queued',
+        wrap(
+            async (req: express.Request, res: express.Response): Promise<void> => {
+                const pageCount = Math.ceil((await queue.length('lsif')) / req.query.limit)
+                const queuedJobs = await queue.queued('lsif', req.offset || 0, (req.offset || 0) + req.query.limit)
+                res.send({ jobs: queuedJobs.map(rewriteJobMeta), hasMore: paginate.hasNextPages(req)(pageCount) })
+            }
+        )
+    )
+
+    router.get(
+        '/failed',
+        wrap(
+            async (req: express.Request, res: express.Response): Promise<void> => {
+                const formatFailedJob = (job: FailedJobMeta): { [K: string]: any } => ({
+                    error: job.error,
+                    failed_at: new Date(job.failed_at).toISOString(),
+                    ...rewriteJobMeta(job.payload),
+                })
+
+                const pageCount = Math.ceil((await queue.failedCount()) / req.query.limit)
+                const failedJobs = await queue.failed(req.offset || 0, (req.offset || 0) + req.query.limit)
+                failedJobs.sort((a, b) => a.failed_at.localeCompare(b.failed_at))
+                res.send({ jobs: failedJobs.map(formatFailedJob), hasMore: paginate.hasNextPages(req)(pageCount) })
             }
         )
     )
