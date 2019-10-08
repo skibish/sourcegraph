@@ -143,7 +143,7 @@ function buildSymbolsDockerImageDependencies() {
     export GOOS=linux
 
     echo "--- build symbols dependencies"
-    parallel  --keep-order --verbose --bar {} ::: cmd/symbols/internal/pkg/ctags/build.sh cmd/symbols/libsqlite3-pcre/build.s
+    parallel  --keep-order --line-buffer --verbose --bar {} ::: cmd/symbols/internal/pkg/ctags/build.sh cmd/symbols/libsqlite3-pcre/build.sh
 
     buildExecutable
 

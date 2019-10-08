@@ -3,4 +3,4 @@
 cd $(dirname "${BASH_SOURCE[0]}")/../../..
 set -euxo pipefail
 
-./enterprise/cmd/frontend/pre-build.sh
+parallel --keep-order --line-buffer --verbose --bar {} ::: ./enterprise/cmd/frontend/pre-build.sh ./cmd/management-console/pre-build.sh

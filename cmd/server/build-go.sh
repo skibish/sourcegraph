@@ -27,4 +27,4 @@ BUILD_COMMAND="go build \
       -tags \"dist netgo\" \
       -o \"$BINDIR/$(basename {})\" {}"
 
-parallel --keep-order --verbose --bar $BUILD_COMMAND:::"${PACKAGES[@]}"
+parallel --keep-order --line-buffer --verbose --bar $BUILD_COMMAND:::"${PACKAGES[@]}"
