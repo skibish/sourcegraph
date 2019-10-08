@@ -3,8 +3,6 @@
 set -euxo pipefail
 cd $(dirname "${BASH_SOURCE[0]}")/../..
 
-parallel --help
-
 pushd ..
 echo "--- yarn root"
 yarn --frozen-lockfile --network-timeout 60000

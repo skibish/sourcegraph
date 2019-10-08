@@ -48,7 +48,7 @@ steps:
       - "push"
       - "${_IMAGE}"
 options:
-  machineType: "N1_HIGHCPU_8"
+  machineType: "N1_HIGHCPU_32"
 timeout: 1200s
 substitutions:
   "_IMAGE": "index.docker.io/sourcegraph/server:latest"
