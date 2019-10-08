@@ -24,7 +24,9 @@ RUN apt-get update && \
     # For switching to postgres user
     sudo \
     # Some of our build scripts use wget
-    wget && \
+    wget \
+    # Needed for building the phabricator extension
+    zip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

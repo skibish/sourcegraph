@@ -1,4 +1,4 @@
-FROM sourcegraph/builder:475db17a4b@sha256:79b1b11d7f622bf4e35979254348163bc2e7dc4353e7103aa23f7e1c46ea56a4 as builder
+FROM sourcegraph/builder:93358ba84e@sha256:0c57e2a246b841e32f0709fa39847f886937cc10dcd2c7291c0968a2afcaedb4 as builder
 
 # Overridable package paths for when this script is called externally by
 # our enterprise build scripts
@@ -38,7 +38,7 @@ WORKDIR /src
 COPY . .
 
 RUN ${PRE_BUILD_SCRIPT}
-RUN ./cmd/server/build.sh
+# RUN ./cmd/server/build.sh
 
 FROM alpine:3.10@sha256:72c42ed48c3a2db31b7dafe17d275b634664a708d901ec9fd57b1529280f01fb AS lsif-builder
 

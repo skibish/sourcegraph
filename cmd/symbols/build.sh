@@ -142,9 +142,7 @@ function buildSymbolsDockerImageDependencies() {
     export GOARCH=amd64
     export GOOS=linux
 
-    ( ./cmd/symbols/internal/pkg/ctags/build.sh ) &
-    ( ./cmd/symbols/libsqlite3-pcre/build.sh ) &
-    wait
+    parallel  --keep-order --verbose --bar {} ::: cmd/symbols/internal/pkg/ctags/build.sh cmd/symbols/libsqlite3-pcre/build.s
 
     buildExecutable
 
