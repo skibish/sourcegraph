@@ -1,5 +1,5 @@
 interface Resource {
-    type: string
+    type: 'User' | 'External service'
     name: string
     create: () => Promise<void>
     destroy: () => Promise<void>

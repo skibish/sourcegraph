@@ -38,6 +38,18 @@ type SelectTextMethod = 'selectall' | 'keyboard'
  */
 type EnterTextMethod = 'type' | 'paste'
 
+interface FindElementOptions {
+    /**
+     * Filter candidate elements to those with the specified tag name
+     */
+    tagName?: keyof HTMLElementTagNameMap
+
+    /**
+     * Log the XPath quer(y|ies) used to find the element.
+     */
+    log?: boolean
+}
+
 export class Driver {
     constructor(
         public browser: puppeteer.Browser,
@@ -407,20 +419,7 @@ export class Driver {
      */
     public async findElementWithText(
         text: string,
-        {
-            tagName: selector,
-            log,
-        }: {
-            /**
-             * Filter candidate elements to those with the specified tag name
-             */
-            tagName?: keyof HTMLElementTagNameMap
-
-            /**
-             * Log the XPath quer(y|ies) used to find the element.
-             */
-            log?: boolean
-        } = {}
+        { tagName: selector, log }: FindElementOptions = {}
     ): Promise<puppeteer.ElementHandle<Element>[]> {
         const tag = selector || '*'
         const queries = [
@@ -438,18 +437,25 @@ export class Driver {
                 return handles
             }
         }
-        throw new Error(`Could not find element with text ${JSON.stringify(text)}${tag ? ' and tag ' + tag : ''}`)
+
+        const lastQuery = queries[queries.length - 1]
+        throw new Error(
+            `Could not find element with text ${JSON.stringify(text)}${
+                tag ? ' and tag ' + tag : ''
+            }. Last attempted XPath query was ${JSON.stringify(
+                lastQuery
+            )}. To debug try the following in the browser debug console: document.evaluate(${JSON.stringify(
+                lastQuery
+            )}, document).iterateNext()`
+        )
     }
 
     /**
      * Click the element containing the text. The element is discovered using the
      * `findElementWithText` method.
      */
-    public async clickElementWithText(
-        text: string,
-        { tagName, log }: { tagName?: keyof HTMLElementTagNameMap; log?: boolean } = {}
-    ): Promise<void> {
-        const handles = await this.findElementWithText(text, { tagName, log })
+    public async clickElementWithText(text: string, options: FindElementOptions = {}): Promise<void> {
+        const handles = await this.findElementWithText(text, options)
         await handles[0].click()
         await Promise.all(handles.map(handle => handle.dispose()))
     }
