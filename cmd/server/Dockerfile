@@ -33,7 +33,7 @@ RUN ln -s /usr/bin/python2.7 /usr/bin/python
 # hadolint ignore=DL3004
 RUN sudo -u postgres -E /usr/lib/postgresql/9.6/bin/pg_ctl initdb
 # hadolint ignore=DL3004
-RUN sudo -u postgres -E /usr/lib/postgresql/9.6/bin/pg_ctl start
+RUN sudo -u postgres -E /usr/lib/postgresql/9.6/bin/pg_ctl -D start
 
 ENV PGUSER postgres
 ENV PGDATA /var/lib/pgsql/data
