@@ -123,6 +123,8 @@ func addDockerfileLint(pipeline *bk.Pipeline) {
 
 // End-to-end tests.
 func addE2E(c Config) func(*bk.Pipeline) {
+	image := fmt.Sprintf("%s:%s_candidate", gcrImageName("server"), c.version)
+
 	return func(pipeline *bk.Pipeline) {
 		pipeline.AddStep(":chromium:",
 			// Avoid crashing the sourcegraph/server containers. See
@@ -130,7 +132,7 @@ func addE2E(c Config) func(*bk.Pipeline) {
 			bk.ConcurrencyGroup("e2e"),
 			bk.Concurrency(1),
 
-			bk.Env("IMAGE", "sourcegraph/server:"+c.version+"_candidate"),
+			bk.Env("IMAGE", image),
 			bk.Env("VERSION", c.version),
 			bk.Env("PUPPETEER_SKIP_CHROMIUM_DOWNLOAD", ""),
 			bk.Cmd("./dev/ci/e2e.sh"),
