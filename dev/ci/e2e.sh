@@ -21,6 +21,9 @@ export DOCKER_HOST="$E2E_DOCKER_HOST"
 export DOCKER_PASSWORD="$E2E_DOCKER_PASSWORD"
 export DOCKER_USERNAME="$E2E_DOCKER_USERNAME"
 
+# Authorize the e2e node to be able to pull from GCR
+yes | gcloud auth configure-docker
+
 echo "--- Running a daemonized $IMAGE as the test subject..."
 CONTAINER="$(docker container run -d -e DEPLOY_TYPE=dev $IMAGE)"
 trap 'kill $(jobs -p -r)'" ; docker logs --timestamps $CONTAINER ; docker container rm -f $CONTAINER ; docker image rm -f $IMAGE" EXIT
