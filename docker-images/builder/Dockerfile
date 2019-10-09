@@ -32,6 +32,10 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Postgres
+ENV PGUSER postgres
+ENV PGDATA /var/lib/pgsql/data
+ENV PGDATABASE postgres
+ENV PGSSLMODE disable
 # hadolint ignore=DL3004,DL3008
 RUN wget -q -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - && \
     sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -sc)-pgdg main" > /etc/apt/sources.list.d/PostgreSQL.list' && \
@@ -41,6 +45,12 @@ RUN wget -q -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-k
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 ENV PATH /usr/local/pgsql/bin:$PATH
+RUN mkdir -p "$PGDATA"
+RUN chown postgres "$PGDATA"
+# hadolint ignore=DL3004
+RUN sudo -u postgres -E /usr/lib/postgresql/9.6/bin/pg_ctl initdb
+# hadolint ignore=DL3004
+RUN sudo -u postgres -E /usr/lib/postgresql/9.6/bin/pg_ctl start
 
 # Symbols service build tools
 # hadolint ignore=DL3008
