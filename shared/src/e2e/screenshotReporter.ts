@@ -13,27 +13,26 @@ export function saveScreenshotsUponFailuresAndClosePage(
     screenshotDir: string,
     getPage: () => puppeteer.Page
 ): void {
-    /**
-     * jasmine reporter does not support async, so we store the promise and wait for it before each test.
-     */
-    let promise = Promise.resolve()
-    beforeEach(() => promise)
-    afterAll(() => promise)
-
-    /**
-     * Take a screenshot when a test fails. Jest standard reporters run in a separate process so they don't have
-     * access to the page instance. Using jasmine reporter allows us to have access to the test result, test name
-     * and page instance at the same time.
-     */
-    jasmine.getEnv().addReporter({
-        specDone: result => {
-            if (result.status === 'failed') {
-                promise = promise
-                    .catch()
-                    .then(() => takeScreenshot(getPage(), repoRootDir, screenshotDir, result.fullName))
-            }
-        },
-    })
+    // /**
+    //  * jasmine reporter does not support async, so we store the promise and wait for it before each test.
+    //  */
+    // let promise = Promise.resolve()
+    // beforeEach(() => promise)
+    // afterAll(() => promise)
+    // /**
+    //  * Take a screenshot when a test fails. Jest standard reporters run in a separate process so they don't have
+    //  * access to the page instance. Using jasmine reporter allows us to have access to the test result, test name
+    //  * and page instance at the same time.
+    //  */
+    // jasmine.getEnv().addReporter({
+    //     specDone: result => {
+    //         if (result.status === 'failed') {
+    //             promise = promise
+    //                 .catch()
+    //                 .then(() => takeScreenshot(getPage(), repoRootDir, screenshotDir, result.fullName))
+    //         }
+    //     },
+    // })
 }
 
 async function takeScreenshot(

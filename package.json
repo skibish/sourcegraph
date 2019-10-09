@@ -225,6 +225,7 @@
     "he": "^1.2.0",
     "highlight.js": "^9.15.10",
     "is-absolute-url": "^3.0.1",
+    "jest-circus": "^24.9.0",
     "lodash": "^4.17.15",
     "marked": "^0.7.0",
     "mdi-react": "^5.5.0",
