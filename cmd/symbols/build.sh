@@ -123,6 +123,14 @@ function execute() {
     "$SYMBOLS_EXECUTABLE_OUTPUT_PATH"
 }
 
+parallel_run() {
+    log_file=$(mktemp)
+    trap "rm -rf $log_file" EXIT
+
+    parallel --keep-order --line-buffer --tag --joblog $log_file "$@"
+    cat $log_file
+}
+
 # Builds the Docker images that the symbols Docker image depends on. The caller
 # must set:
 #
@@ -143,7 +151,7 @@ function buildSymbolsDockerImageDependencies() {
     export GOOS=linux
 
     echo "--- build symbols dependencies"
-    parallel  --keep-order --line-buffer --tag --bar {} ::: cmd/symbols/internal/pkg/ctags/build.sh cmd/symbols/libsqlite3-pcre/build.sh
+    parallel_run {} ::: cmd/symbols/internal/pkg/ctags/build.sh cmd/symbols/libsqlite3-pcre/build.sh
 
     buildExecutable
 

@@ -9,7 +9,15 @@ yarn --mutex network --frozen-lockfile --network-timeout 60000
 NODE_ENV=${NODE_ENV:-production}
 TARGETS=${TARGETS:-phabricator}
 
-parallel --keep-order --line-buffer --tag {} ::: "env NODE_ENV=$NODE_ENV browser/build.sh" "env TARGETS=$TARGETS web/build.sh"
+parallel_run() {
+    log_file=$(mktemp)
+    trap "rm -rf $log_file" EXIT
+
+    parallel --keep-order --line-buffer --tag --joblog $log_file "$@"
+    cat $log_file
+}
+
+parallel_run {} ::: "env NODE_ENV=$NODE_ENV browser/build.sh" "env TARGETS=$TARGETS web/build.sh"
 
 echo "--- generate"
 enterprise/dev/generate.sh
