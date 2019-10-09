@@ -42,6 +42,7 @@ RUN ./cmd/server/build.sh
 
 FROM alpine:3.10@sha256:72c42ed48c3a2db31b7dafe17d275b634664a708d901ec9fd57b1529280f01fb AS lsif-builder
 
+# hadolint ignore=DL3018
 RUN apk add --no-cache bash nodejs-current=12.4.0-r0 nodejs-npm=10.16.3-r0
 RUN npm install -g yarn@1.17.3
 
@@ -98,7 +99,7 @@ COPY --from=sourcegraph/prometheus:10.0.0@sha256:aca8cf12d41cbf5d8885ed675fa017b
 COPY --from=sourcegraph/prometheus:10.0.0@sha256:aca8cf12d41cbf5d8885ed675fa017b83ad73af96d86bbe5bcead45ca8e958f3 /usr/share/prometheus /usr/share/prometheus
 
 # hadolint ignore=DL3018
-RUN set -euxo pipefail && \
+RUN set -eux && \
     addgroup -S grafana && \
     adduser -S -G grafana grafana && \
     apk add --no-cache libc6-compat=1.1.23-r3 ca-certificates su-exec

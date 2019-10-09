@@ -8,6 +8,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# hadolint ignore=DL3008
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     build-essential \
@@ -31,6 +32,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Postgres
+# hadolint ignore=DL3004,DL3008
 RUN wget -q -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - && \
     sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -sc)-pgdg main" > /etc/apt/sources.list.d/PostgreSQL.list' && \
     apt-get update && \
@@ -41,6 +43,7 @@ RUN wget -q -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-k
 ENV PATH /usr/local/pgsql/bin:$PATH
 
 # Symbols service build tools
+# hadolint ignore=DL3008
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libjansson-dev \
@@ -57,9 +60,11 @@ ENV NODE_VERSION 12.10.0
 ENV NPM_VERSION 6.11.3
 ENV YARN_VERSION 1.17.3
 ENV NVM_DIR /usr/local/nvm
+# hadolint ignore=DL4001
 RUN mkdir $NVM_DIR && \
     curl -Lfs https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
 ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
+# hadolint ignore=DL4001
 RUN echo "source $NVM_DIR/nvm.sh && \
     nvm install 10.13.0 && \
     npm install --global npm@$NPM_VERSION && \
@@ -71,8 +76,10 @@ RUN echo "source $NVM_DIR/nvm.sh && \
 
 # Go
 ENV GO_VERSION 1.13
+# hadolint ignore=DL4001
 RUN curl -Lfs "https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz" | tar xz && mv go /usr/local
 ENV GOPATH /go
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
+# hadolint ignore=DL4001
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 WORKDIR $GOPATH
