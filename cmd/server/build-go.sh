@@ -25,6 +25,6 @@ BUILD_COMMAND="go build \
       -buildmode exe \
       -installsuffix netgo \
       -tags \"dist netgo\" \
-      -o \"$BINDIR/$(basename {})\" {}"
+      -o $BINDIR/\$(basename {}) {}"
 
 parallel --keep-order --line-buffer --tag --bar $BUILD_COMMAND ::: "${PACKAGES[@]}"
