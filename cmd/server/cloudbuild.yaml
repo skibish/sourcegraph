@@ -48,7 +48,7 @@ steps:
       - "push"
       - "${_IMAGE}"
 tags:
-  - "${_IMAGE}"
+  - "server"
   - "${_COMMIT_SHA}"
 images:
   - "${_IMAGE}"
