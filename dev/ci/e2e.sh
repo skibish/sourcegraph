@@ -29,7 +29,7 @@ env \
     DOCKER_HOST="$BUILD_DOCKER_HOST" \
     DOCKER_PASSWORD="$BUILD_DOCKER_PASSWORD" \
     DOCKER_USERNAME="$BUILD_DOCKER_USERNAME" \
-    docker save "$IMAGE" \
+    docker pull "$IMAGE" && docker save "$IMAGE" \
     | docker load
 echo "Copying $IMAGE to the dedicated e2e testing node... done"
 
