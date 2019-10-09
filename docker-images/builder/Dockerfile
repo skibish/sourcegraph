@@ -47,10 +47,6 @@ RUN wget -q -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-k
 ENV PATH /usr/local/pgsql/bin:$PATH
 RUN mkdir -p "$PGDATA"
 RUN chown postgres "$PGDATA"
-# hadolint ignore=DL3004
-RUN sudo -u postgres -E /usr/lib/postgresql/9.6/bin/pg_ctl initdb
-# hadolint ignore=DL3004
-RUN sudo -u postgres -E /usr/lib/postgresql/9.6/bin/pg_ctl start
 
 # Symbols service build tools
 # hadolint ignore=DL3008

@@ -1,4 +1,4 @@
-FROM sourcegraph/builder:014a320b16@sha256:3adb3928155afa592593ac98999e085e1d9935efa35d239e7db7394cd1dc888f as builder
+FROM sourcegraph/builder:f0477ccc01@sha256:0f14baa016789955064b62519d15cd2f5787eb266bee6fef29e8aac7d77ed6e0 as builder
 
 ARG VERSION="unknown"
 ENV VERSION ${VERSION}
@@ -13,6 +13,12 @@ RUN mkdir -p ${OUTPUT_DIR}
 
 WORKDIR /src
 COPY . .
+
+# Start postgres (for the dev/generate.sh scripts)
+# hadolint ignore=DL3004
+RUN sudo -u postgres -E /usr/lib/postgresql/9.6/bin/pg_ctl initdb
+# hadolint ignore=DL3004
+RUN sudo -u postgres -E /usr/lib/postgresql/9.6/bin/pg_ctl start
 
 RUN ${PRE_BUILD_SCRIPT}
 RUN cmd/frontend/build.sh

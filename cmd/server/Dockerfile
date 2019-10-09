@@ -1,4 +1,4 @@
-FROM sourcegraph/builder:014a320b16@sha256:3adb3928155afa592593ac98999e085e1d9935efa35d239e7db7394cd1dc888f as builder
+FROM sourcegraph/builder:f0477ccc01@sha256:0f14baa016789955064b62519d15cd2f5787eb266bee6fef29e8aac7d77ed6e0 as builder
 
 # Overridable package paths for when this script is called externally by
 # our enterprise build scripts
@@ -28,6 +28,12 @@ ARG PRE_BUILD_SCRIPT="cmd/server/pre-build.sh"
 # Set the default python version to 2.7
 # (for the management-console's node-sass depdendency)
 RUN ln -s /usr/bin/python2.7 /usr/bin/python
+
+# Start postgres (for the dev/generate.sh scripts)
+# hadolint ignore=DL3004
+RUN sudo -u postgres -E /usr/lib/postgresql/9.6/bin/pg_ctl initdb
+# hadolint ignore=DL3004
+RUN sudo -u postgres -E /usr/lib/postgresql/9.6/bin/pg_ctl start
 
 ENV PGUSER postgres
 ENV PGDATA /var/lib/pgsql/data
