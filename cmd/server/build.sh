@@ -4,8 +4,6 @@
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 set -euxo pipefail
 
-export PS4='+[${SECONDS}s][${BASH_SOURCE}:${LINENO}]: ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
-
 # Environment for building linux binaries
 export GO111MODULE=on
 export GOARCH=amd64

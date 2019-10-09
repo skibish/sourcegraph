@@ -47,11 +47,16 @@ steps:
     args:
       - "push"
       - "${_IMAGE}"
+tags:
+  - "${_IMAGE}"
+  - "${_COMMIT_SHA}"
+images:
+  - "${_IMAGE}"
 options:
-  machineType: "N1_HIGHCPU_8"
+  machineType: "N1_HIGHCPU_32"
 timeout: 1200s
 substitutions:
-  "_IMAGE": "index.docker.io/sourcegraph/server:latest"
+  "_IMAGE": "us.gcr.io/sourcegraph-dev/server:latest"
   "_COMMIT_SHA": "unknown"
   "_DATE": "unknown"
   "_VERSION": "unknown"
