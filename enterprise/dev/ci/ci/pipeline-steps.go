@@ -278,14 +278,14 @@ func addDockerImage(c Config, app string, insiders bool) func(*bk.Pipeline) {
 
 		getBuildSteps := func() []bk.StepOpt {
 			buildStepsByApp := map[string][]bk.StepOpt{
-				"symbols": []bk.StepOpt{
+				"symbols": {
 					bk.Env("BUILD_TYPE", "dist"),
 					bk.Cmd("./cmd/symbols/docker.sh"),
 					bk.Cmd(fmt.Sprintf("docker pull %s:%s", gcrImage, c.version)),
 				},
 
 				// The server image was built prior to e2e tests in a previous step.
-				"server": []bk.StepOpt{
+				"server": {
 					bk.Cmd(fmt.Sprintf("docker pull %s:%s_candidate", gcrImage, c.version)),
 					bk.Cmd(fmt.Sprintf("docker tag %s:%s_candidate %s:%s", gcrImage, c.version, gcrImage, c.version)),
 					bk.Cmd(fmt.Sprintf("gcloud container images untag %s:%s_candidate", gcrImage, c.version)),
