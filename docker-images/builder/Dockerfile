@@ -17,6 +17,7 @@ RUN apt-get update && \
     git \
     # For apt-key add
     gnupg \
+    gosu \
     lsb-core \
     make \
     parallel \
@@ -32,16 +33,18 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Postgres
+ENV PGHOST 127.0.0.1
 ENV PGUSER postgres
 ENV PGDATA /var/lib/pgsql/data
 ENV PGDATABASE postgres
 ENV PGSSLMODE disable
 # hadolint ignore=DL3004,DL3008
-RUN wget -q -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - && \
-    sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -sc)-pgdg main" > /etc/apt/sources.list.d/PostgreSQL.list' && \
+RUN wget -q -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+    sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -sc)-pgdg main" > /etc/apt/sources.list.d/PostgreSQL.list' && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-    postgresql-9.6 && \
+    postgresql-9.6 \
+    postgresql-contrib-9.6 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 ENV PATH /usr/local/pgsql/bin:$PATH

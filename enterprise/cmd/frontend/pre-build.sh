@@ -19,5 +19,11 @@ TARGETS=${TARGETS:-phabricator}
 
 parallel_run {} ::: "env NODE_ENV=$NODE_ENV browser/build.sh" "env TARGETS=$TARGETS web/build.sh"
 
+# Start postgres (for the dev/generate.sh scripts)
+gosu postgres /usr/lib/postgresql/9.6/bin/pg_ctl initdb
+## Allow pgsql to listen to all IPs
+## See https://stackoverflow.com/a/52381997 for more information
+gosu postgres /usr/lib/postgresql/9.6/bin/pg_ctl -o "-c listen_addresses='*'" -w start
+
 echo "--- generate"
 enterprise/dev/generate.sh

@@ -1,4 +1,4 @@
-FROM sourcegraph/builder:f0477ccc01@sha256:0f14baa016789955064b62519d15cd2f5787eb266bee6fef29e8aac7d77ed6e0 as builder
+FROM sourcegraph/builder:2d297a9c7f@sha256:60a17014bded94514c4e974ec69c2b9857ba26e6c73d8bec13bc13045a088d3e as builder
 
 # Overridable package paths for when this script is called externally by
 # our enterprise build scripts
@@ -28,20 +28,6 @@ ARG PRE_BUILD_SCRIPT="cmd/server/pre-build.sh"
 # Set the default python version to 2.7
 # (for the management-console's node-sass depdendency)
 RUN ln -s /usr/bin/python2.7 /usr/bin/python
-
-# Start postgres (for the dev/generate.sh scripts)
-# hadolint ignore=DL3004
-RUN sudo -u postgres -E /usr/lib/postgresql/9.6/bin/pg_ctl initdb
-## Allow pgsql to listen to all IPs
-## See https://stackoverflow.com/a/52381997 for more information
-RUN echo "listen_addresses = '*'" >> "$PGDATA/postgresql.conf"
-# hadolint ignore=DL3004
-RUN sudo -u postgres -E /usr/lib/postgresql/9.6/bin/pg_ctl -w start
-
-ENV PGUSER postgres
-ENV PGDATA /var/lib/pgsql/data
-ENV PGDATABASE postgres
-ENV PGSSLMODE disable
 
 WORKDIR /src
 COPY . .

@@ -1,4 +1,4 @@
-FROM sourcegraph/builder:f0477ccc01@sha256:0f14baa016789955064b62519d15cd2f5787eb266bee6fef29e8aac7d77ed6e0 as builder
+FROM sourcegraph/builder:2d297a9c7f@sha256:60a17014bded94514c4e974ec69c2b9857ba26e6c73d8bec13bc13045a088d3e as builder
 
 ARG VERSION="unknown"
 ENV VERSION ${VERSION}
@@ -13,15 +13,6 @@ RUN mkdir -p ${OUTPUT_DIR}
 
 WORKDIR /src
 COPY . .
-
-# Start postgres (for the dev/generate.sh scripts)
-# hadolint ignore=DL3004
-RUN sudo -u postgres -E /usr/lib/postgresql/9.6/bin/pg_ctl initdb
-## Allow pgsql to listen to all IPs
-## See https://stackoverflow.com/a/52381997 for more information
-RUN echo "listen_addresses = '*'" >> "$PGDATA/postgresql.conf"
-# hadolint ignore=DL3004
-RUN sudo -u postgres -E /usr/lib/postgresql/9.6/bin/pg_ctl -w start
 
 RUN ${PRE_BUILD_SCRIPT}
 RUN cmd/frontend/build.sh

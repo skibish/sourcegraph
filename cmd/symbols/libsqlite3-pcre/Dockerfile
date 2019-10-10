@@ -1,4 +1,4 @@
-FROM sourcegraph/builder:f0477ccc01@sha256:0f14baa016789955064b62519d15cd2f5787eb266bee6fef29e8aac7d77ed6e0 as builder
+FROM sourcegraph/builder:2d297a9c7f@sha256:60a17014bded94514c4e974ec69c2b9857ba26e6c73d8bec13bc13045a088d3e as builder
 
 ENV OUTPUT_DIR=/output
 RUN mkdir -p ${OUTPUT_DIR}
