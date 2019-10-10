@@ -11,4 +11,6 @@ parallel_run() {
     cat $log_file
 }
 
+# We run the the management-console's pre-build script in parallel because it invokes expensive
+# yarn/node commands
 parallel_run {} ::: ./enterprise/cmd/frontend/pre-build.sh ./cmd/management-console/pre-build.sh
