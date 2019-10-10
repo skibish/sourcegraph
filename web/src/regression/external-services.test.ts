@@ -89,7 +89,7 @@ describe('External services regression test suite', () => {
         await driver.clickElementWithText('Proceed to')
         await driver.page.waitForSelector('.monaco-editor')
 
-        // >>>>>>
+        // >>>>>> modifyJSONC
 
         // await driver.clickElementWithText('Copy')
         // driver.page.

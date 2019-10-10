@@ -8,6 +8,8 @@ export interface Config {
     sudoToken: string
     sudoUsername: string
     gitHubToken: string
+    gitHubUserBobPassword: string
+    gitHubUserAmyPassword: string
     sourcegraphBaseUrl: string
     managementConsoleUrl: string
     includeAdminOnboarding: boolean
@@ -57,6 +59,14 @@ const configFields: ConfigFields = {
         envVar: 'GITHUB_TOKEN',
         description:
             'A GitHub personal access token that will be used to authenticate a GitHub external service. It does not need to have any scopes.',
+    },
+    gitHubUserBobPassword: {
+        envVar: 'GITHUB_USER_BOB_PASSWORD',
+        description: 'Password of the GitHub user sg-e2e-regression-test-bob, used to log into Sourcegraph.',
+    },
+    gitHubUserAmyPassword: {
+        envVar: 'GITHUB_USER_AMY_PASSWORD',
+        description: 'Password of the GitHub user sg-e2e-regression-test-amy, used to log into Sourcegraph.',
     },
     sourcegraphBaseUrl: {
         envVar: 'SOURCEGRAPH_BASE_URL',
