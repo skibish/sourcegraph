@@ -8,7 +8,13 @@ import { Driver } from '../../../shared/src/e2e/driver'
 import { getConfig } from '../../../shared/src/e2e/config'
 import { getTestFixtures } from './util/init'
 import { ensureLoggedInOrCreateTestUser } from './util/helpers'
-import { deleteUser, setUserSiteAdmin, getUser, ensureNoTestExternalServices } from './util/api'
+import {
+    deleteUser,
+    setUserSiteAdmin,
+    getUser,
+    ensureNoTestExternalServices,
+    getManagementConsoleState,
+} from './util/api'
 import { retry } from '../../../shared/src/e2e/e2e-test-utils'
 import * as GQL from '../../../shared/src/graphql/schema'
 
@@ -24,7 +30,8 @@ describe('External services regression test suite', () => {
         'logBrowserConsole',
         'slowMo',
         'headless',
-        'keepBrowser'
+        'keepBrowser',
+        'managementConsoleUrl'
     )
 
     let driver: Driver
@@ -57,6 +64,36 @@ describe('External services regression test suite', () => {
         if (driver) {
             await driver.close()
         }
+    })
+
+    test('Access management console', async () => {
+        const managementConsolePassword = (await getManagementConsoleState(gqlClient)).plaintextPassword
+        if (!managementConsolePassword) {
+            throw new Error('empty management console password')
+        }
+        const authHeaders = {
+            Authorization: `Basic ${new Buffer(`:${managementConsolePassword}`).toString('base64')}`,
+        }
+
+        try {
+            await driver.page.goto(config.managementConsoleUrl)
+        } catch (err) {
+            if (!err.message.includes('net::ERR_CERT_AUTHORITY_INVALID')) {
+                throw err
+            }
+        }
+        await driver.page.waitForSelector('#details-button')
+        await driver.page.click('#details-button')
+        await driver.page.setExtraHTTPHeaders(authHeaders) // TODO: need to remove?
+
+        await driver.clickElementWithText('Proceed to')
+        await driver.page.waitForSelector('.monaco-editor')
+
+        // >>>>>>
+
+        // await driver.clickElementWithText('Copy')
+        // driver.page.
+        // await driver.page.goto(config.managementConsoleUrl)
     })
 
     test('9.1. GitHub.com. In addition to verifying the correct repos are added, verify permissions are correct.', async () => {
@@ -112,11 +149,11 @@ describe('External services regression test suite', () => {
     })
 
     // test('9.2. GitHub Enterprise. In addition to verifying the correct repos are added, verify permissions are correct. #lyft', async () => {
-    //     //
+    //     // TODO
     // })
 
     // test('9.3. AWS CodeCommit', async () => {
-    //     //
+    //     // TODO
     // })
 
     // test('9.4. Bitbucket Server', async () => {

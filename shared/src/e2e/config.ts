@@ -9,6 +9,7 @@ export interface Config {
     sudoUsername: string
     gitHubToken: string
     sourcegraphBaseUrl: string
+    managementConsoleUrl: string
     includeAdminOnboarding: boolean
     testUserPassword: string
     noCleanup: boolean
@@ -62,6 +63,11 @@ const configFields: ConfigFields = {
         defaultValue: 'http://localhost:3080',
         description:
             'The base URL of the Sourcegraph instance, e.g., https://sourcegraph.sgdev.org or http://localhost:3080.',
+    },
+    managementConsoleUrl: {
+        envVar: 'MANAGEMENT_CONSOLE_URL',
+        defaultValue: 'https://localhost:2633',
+        description: 'URL at which the management console is accessible.',
     },
     includeAdminOnboarding: {
         envVar: 'INCLUDE_ADMIN_ONBOARDING',

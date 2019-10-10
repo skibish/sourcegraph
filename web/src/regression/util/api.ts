@@ -9,6 +9,7 @@ import { map, tap, retryWhen, delayWhen, take } from 'rxjs/operators'
 import { zip, timer, concat, throwError, defer } from 'rxjs'
 import { CloneInProgressError, ECLONEINPROGESS } from '../../../../shared/src/backend/errors'
 import { isErrorLike } from '../../../../shared/src/util/errors'
+import { SiteAdminManagementConsolePassword } from '../../site-admin/SiteAdminManagementConsolePassword'
 
 /**
  * Wait until all repositories in the list exist.
@@ -288,6 +289,26 @@ export function currentProductVersion(gqlClient: GraphQLClient): Promise<string>
         .pipe(
             map(dataOrThrowErrors),
             map(({ site }) => site.productVersion)
+        )
+        .toPromise()
+}
+
+export function getManagementConsoleState(gqlClient: GraphQLClient): Promise<GQL.IManagementConsoleState> {
+    return gqlClient
+        .queryGraphQL(
+            gql`
+                query ManagementConsoleState {
+                    site {
+                        managementConsoleState {
+                            plaintextPassword
+                        }
+                    }
+                }
+            `
+        )
+        .pipe(
+            map(dataOrThrowErrors),
+            map(({ site }) => site.managementConsoleState)
         )
         .toPromise()
 }
