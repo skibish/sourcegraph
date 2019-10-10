@@ -17,8 +17,11 @@ COPY . .
 # Start postgres (for the dev/generate.sh scripts)
 # hadolint ignore=DL3004
 RUN sudo -u postgres -E /usr/lib/postgresql/9.6/bin/pg_ctl initdb
+## Allow pgsql to listen to all IPs
+## See https://stackoverflow.com/a/52381997 for more information
+RUN echo "listen_addresses = '*'" >> "$PGDATA/postgresql.conf"
 # hadolint ignore=DL3004
-RUN sudo -u postgres -E /usr/lib/postgresql/9.6/bin/pg_ctl start
+RUN sudo -u postgres -E /usr/lib/postgresql/9.6/bin/pg_ctl -w start
 
 RUN ${PRE_BUILD_SCRIPT}
 RUN cmd/frontend/build.sh

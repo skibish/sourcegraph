@@ -32,8 +32,11 @@ RUN ln -s /usr/bin/python2.7 /usr/bin/python
 # Start postgres (for the dev/generate.sh scripts)
 # hadolint ignore=DL3004
 RUN sudo -u postgres -E /usr/lib/postgresql/9.6/bin/pg_ctl initdb
+## Allow pgsql to listen to all IPs
+## See https://stackoverflow.com/a/52381997 for more information
+RUN echo "listen_addresses = '*'" >> "$PGDATA/postgresql.conf"
 # hadolint ignore=DL3004
-RUN sudo -u postgres -E /usr/lib/postgresql/9.6/bin/pg_ctl start
+RUN sudo -u postgres -E /usr/lib/postgresql/9.6/bin/pg_ctl -w start
 
 ENV PGUSER postgres
 ENV PGDATA /var/lib/pgsql/data
