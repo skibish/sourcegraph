@@ -4,6 +4,14 @@
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 set -euxo pipefail
 
+parallel_run() {
+    log_file=$(mktemp)
+    trap "rm -rf $log_file" EXIT
+
+    parallel --keep-order --line-buffer --tag --joblog $log_file "$@"
+    cat $log_file
+}
+
 # Environment for building linux binaries
 export GO111MODULE=on
 export GOARCH=amd64
@@ -17,14 +25,6 @@ mkdir -p "$BINDIR"
 export CTAGS_D_OUTPUT_PATH="$OUTPUT_DIR/.ctags.d"
 export SYMBOLS_EXECUTABLE_OUTPUT_PATH="$BINDIR/symbols"
 export BUILD_TYPE=dist
-
-parallel_run() {
-    log_file=$(mktemp)
-    trap "rm -rf $log_file" EXIT
-
-    parallel --keep-order --line-buffer --tag --joblog $log_file "$@"
-    cat $log_file
-}
 
 parallel_run {} ::: "cmd/server/build-go.sh" "cmd/symbols/build.sh buildSymbolsDockerImageDependencies"
 

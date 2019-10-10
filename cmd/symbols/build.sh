@@ -19,6 +19,14 @@ case "$OSTYPE" in
         ;;
 esac
 
+parallel_run() {
+    log_file=$(mktemp)
+    trap "rm -rf $log_file" EXIT
+
+    parallel --keep-order --line-buffer --tag --joblog $log_file "$@"
+    cat $log_file
+}
+
 # Builds the PCRE extension to sqlite3.
 function buildLibsqlite3Pcre() {
     if ! command -v pkg-config >/dev/null 2>&1 || ! command -v pkg-config --cflags sqlite3 libpcre >/dev/null 2>&1; then
@@ -121,14 +129,6 @@ function execute() {
     export CTAGS_COMMAND="${CTAGS_COMMAND:=cmd/symbols/universal-ctags-dev}"
     export CTAGS_PROCESSES="${CTAGS_PROCESSES:=1}"
     "$SYMBOLS_EXECUTABLE_OUTPUT_PATH"
-}
-
-parallel_run() {
-    log_file=$(mktemp)
-    trap "rm -rf $log_file" EXIT
-
-    parallel --keep-order --line-buffer --tag --joblog $log_file "$@"
-    cat $log_file
 }
 
 # Builds the Docker images that the symbols Docker image depends on. The caller

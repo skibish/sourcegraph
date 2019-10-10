@@ -3,6 +3,14 @@
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 set -euxo pipefail
 
+parallel_run() {
+    log_file=$(mktemp)
+    trap "rm -rf $log_file" EXIT
+
+    parallel --keep-order --line-buffer --tag --joblog $log_file "$@"
+    cat $log_file
+}
+
 echo "--- go build"
 
 PACKAGES=(
@@ -26,13 +34,5 @@ BUILD_COMMAND="go build \
       -installsuffix netgo \
       -tags \"dist netgo\" \
       -o $BINDIR/\$(basename {}) {}"
-
-parallel_run() {
-    log_file=$(mktemp)
-    trap "rm -rf $log_file" EXIT
-
-    parallel --keep-order --line-buffer --tag --joblog $log_file "$@"
-    cat $log_file
-}
 
 parallel_run $BUILD_COMMAND ::: "${PACKAGES[@]}"
