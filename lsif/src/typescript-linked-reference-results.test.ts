@@ -26,14 +26,14 @@ describe('Database', () => {
         const input = await getTestData('typescript/linked-reference-results/data/data.lsif.gz')
         const tmp = path.join(storageRoot, 'tmp')
         const { packages, references } = await convertLsif(input, tmp, {})
-        const dumpID = await xrepoDatabase.addPackagesAndReferences(repository, commit, packages, references)
+        const dumpID = await xrepoDatabase.addPackagesAndReferences(repository, commit, '', packages, references)
         await fs.rename(tmp, dbFilename(storageRoot, dumpID, repository, commit))
     })
 
     afterAll(async () => await rmfr(storageRoot))
 
     const loadDatabase = async (repository: string, commit: string): Promise<Database> => {
-        const dump = await xrepoDatabase.getDump(repository, commit)
+        const dump = await xrepoDatabase.getDump(repository, commit, '')
         if (!dump) {
             throw new Error(`Unknown repository@commit ${repository}@${commit}`)
         }
@@ -45,7 +45,8 @@ describe('Database', () => {
             documentCache,
             resultChunkCache,
             dump.id,
-            dbFilename(storageRoot, dump.id, dump.repository, dump.commit)
+            dbFilename(storageRoot, dump.id, dump.repository, dump.commit),
+            ''
         )
     }
 
