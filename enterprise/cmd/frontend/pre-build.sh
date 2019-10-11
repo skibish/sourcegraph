@@ -17,7 +17,7 @@ yarn --mutex network --frozen-lockfile --network-timeout 60000
 NODE_ENV=${NODE_ENV:-production}
 TARGETS=${TARGETS:-phabricator}
 
-parallel_run {} ::: "env NODE_ENV=$NODE_ENV browser/build.sh" "env TARGETS=$TARGETS web/build.sh"
+parallel_run {} ::: "env TARGETS=$TARGETS browser/build.sh" "env NODE_ENV=$NODE_ENV web/build.sh"
 
 # Start postgres (for the dev/generate.sh scripts)
 gosu postgres /usr/lib/postgresql/9.6/bin/pg_ctl initdb
@@ -26,4 +26,4 @@ gosu postgres /usr/lib/postgresql/9.6/bin/pg_ctl initdb
 gosu postgres /usr/lib/postgresql/9.6/bin/pg_ctl -o "-c listen_addresses='*'" -w start
 
 echo "--- generate"
-enterprise/dev/generate.sh
+./enterprise/dev/generate.sh
