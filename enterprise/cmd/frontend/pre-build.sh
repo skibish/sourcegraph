@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -exo pipefail
+set -exuo pipefail
 cd $(dirname "${BASH_SOURCE[0]}")/../../..
 
 parallel_run() {
@@ -14,10 +14,20 @@ parallel_run() {
 echo "--- yarn root"
 yarn --mutex network --frozen-lockfile --network-timeout 60000
 
-NODE_ENV=${NODE_ENV:-production}
-TARGETS=${TARGETS:-phabricator}
+build_browser() {
+    echo "--- yarn browser"
+    (cd browser && TARGETS=phabricator yarn build)
+}
 
-parallel_run {} ::: "env TARGETS=$TARGETS browser/build.sh" "env NODE_ENV=$NODE_ENV web/build.sh"
+build_web() {
+    echo "--- yarn web"
+    (cd web && NODE_ENV=production yarn -s run build --color)
+}
+
+export -f build_browser
+export -f build_web
+
+parallel_run ::: build_browser build_web
 
 # Start postgres (for the dev/generate.sh scripts)
 gosu postgres /usr/lib/postgresql/9.6/bin/pg_ctl initdb

@@ -151,7 +151,7 @@ function buildSymbolsDockerImageDependencies() {
     export GOOS=linux
 
     echo "--- build symbols dependencies"
-    parallel_run {} ::: cmd/symbols/internal/pkg/ctags/build.sh cmd/symbols/libsqlite3-pcre/build.sh
+    parallel_run {} ::: "env OUTPUT_DIR=$CTAGS_D_OUTPUT_PATH cmd/symbols/internal/pkg/ctags/build.sh" cmd/symbols/libsqlite3-pcre/build.sh
 
     buildExecutable
 
