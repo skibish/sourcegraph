@@ -8,13 +8,7 @@ import { Driver } from '../../../shared/src/e2e/driver'
 import { getConfig } from '../../../shared/src/e2e/config'
 import { getTestFixtures } from './util/init'
 import { ensureLoggedInOrCreateTestUser } from './util/helpers'
-import {
-    deleteUser,
-    setUserSiteAdmin,
-    getUser,
-    ensureNoTestExternalServices,
-    getManagementConsoleState,
-} from './util/api'
+import { deleteUser, setUserSiteAdmin, getUser, ensureNoTestExternalServices } from './util/api'
 import { retry } from '../../../shared/src/e2e/e2e-test-utils'
 import * as GQL from '../../../shared/src/graphql/schema'
 
@@ -30,8 +24,7 @@ describe('External services regression test suite', () => {
         'logBrowserConsole',
         'slowMo',
         'headless',
-        'keepBrowser',
-        'managementConsoleUrl'
+        'keepBrowser'
     )
 
     let driver: Driver
@@ -42,13 +35,14 @@ describe('External services regression test suite', () => {
         await resourceManager.create({
             type: 'User',
             name: testUsername,
-            create: () =>
-                ensureLoggedInOrCreateTestUser(driver, gqlClient, {
+            create: async () => {
+                await ensureLoggedInOrCreateTestUser(driver, gqlClient, {
                     username: testUsername,
                     deleteIfExists: true,
                     ...config,
-                }),
-            destroy: () => deleteUser(gqlClient, testUsername, false),
+                })
+                return () => deleteUser(gqlClient, testUsername, false)
+            },
         })
         const user = await getUser(gqlClient, testUsername)
         if (!user) {
@@ -64,39 +58,9 @@ describe('External services regression test suite', () => {
         if (driver) {
             await driver.close()
         }
-    })
+    }, 10 * 1000)
 
-    test('Access management console', async () => {
-        const managementConsolePassword = (await getManagementConsoleState(gqlClient)).plaintextPassword
-        if (!managementConsolePassword) {
-            throw new Error('empty management console password')
-        }
-        const authHeaders = {
-            Authorization: `Basic ${new Buffer(`:${managementConsolePassword}`).toString('base64')}`,
-        }
-
-        try {
-            await driver.page.goto(config.managementConsoleUrl)
-        } catch (err) {
-            if (!err.message.includes('net::ERR_CERT_AUTHORITY_INVALID')) {
-                throw err
-            }
-        }
-        await driver.page.waitForSelector('#details-button')
-        await driver.page.click('#details-button')
-        await driver.page.setExtraHTTPHeaders(authHeaders) // TODO: need to remove?
-
-        await driver.clickElementWithText('Proceed to')
-        await driver.page.waitForSelector('.monaco-editor')
-
-        // >>>>>> modifyJSONC
-
-        // await driver.clickElementWithText('Copy')
-        // driver.page.
-        // await driver.page.goto(config.managementConsoleUrl)
-    })
-
-    test('9.1. GitHub.com. In addition to verifying the correct repos are added, verify permissions are correct.', async () => {
+    test('GitHub.com external service', async () => {
         const externalServiceName = '[TEST] Regression test: GitHub.com'
         await ensureNoTestExternalServices(gqlClient, {
             kind: GQL.ExternalServiceKind.GITHUB,
@@ -136,67 +100,15 @@ describe('External services regression test suite', () => {
         await resourceManager.create({
             type: 'External service',
             name: externalServiceName,
-            create: () => Promise.resolve(), // already created above
-            destroy: () =>
-                ensureNoTestExternalServices(gqlClient, {
-                    kind: GQL.ExternalServiceKind.GITHUB,
-                    uniqueDisplayName: externalServiceName,
-                    deleteIfExist: true,
-                }),
+            create: () =>
+                // already created above
+                Promise.resolve(() =>
+                    ensureNoTestExternalServices(gqlClient, {
+                        kind: GQL.ExternalServiceKind.GITHUB,
+                        uniqueDisplayName: externalServiceName,
+                        deleteIfExist: true,
+                    })
+                ),
         })
-
-        // TODO: Check authz
     })
-
-    // test('9.2. GitHub Enterprise. In addition to verifying the correct repos are added, verify permissions are correct. #lyft', async () => {
-    //     // TODO
-    // })
-
-    // test('9.3. AWS CodeCommit', async () => {
-    //     // TODO
-    // })
-
-    // test('9.4. Bitbucket Server', async () => {
-    //     // TODO
-    // })
-
-    // test('9.4.1 Bitbucket Server ACLs', async () => {
-    //     // TODO
-    // })
-
-    // test('9.5. GitLab. In addition to verifying the correct repos are added, verify permissions with identityProvider type "external", "oauth", and "username".', async () => {
-    //     // TODO
-    // })
-
-    // test('9.6. Gitolite. Include in the test verification of the phabricator field. #uber', async () => {
-    //     // TODO
-    // })
-
-    // test('9.7. Phabricator connection', async () => {
-    //     // TODO
-    // })
-
-    // test('9.8. Single Git repositories', async () => {
-    //     // TODO
-    // })
-
-    // test('9.9 When `repositoryPathPattern` is configured, paths from the full long name will redirect to the configured name. Extensions will function with the configured name. `repositoryPathPattern` allows administrators to configure "nice names". For example `so', async () => {
-    //     // TODO
-    // })
-
-    // test('9.10. Bitbucket Cloud', async () => {
-    //     // TODO
-    // })
-
-    // test('9.11. Status indicator in the navigation bar is enabled.', async () => {
-    //     // TODO
-    // })
-
-    // test('9.12. In the GitHub and Bitbucket Server external service configs, `repositoryQuery` is only required if `repos` is not set.', async () => {
-    //     // TODO
-    // })
-
-    // test('9.13 Updating or creating an external service will no longer block until the service is synced. ', async () => {
-    //     // TODO
-    // })
 })

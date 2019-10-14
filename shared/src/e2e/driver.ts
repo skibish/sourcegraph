@@ -407,6 +407,16 @@ export class Driver {
         }
     }
 
+    // public async gotoManagementConsole(managementConsoleUrl: string): Promise<void> {
+    //     try {
+    //         await this.page.goto(managementConsoleUrl)
+    //     } catch (err) {
+    //         if (!err.message.includes('net::ERR_CERT_AUTHORITY_INVALID')) {
+    //             throw err
+    //         }
+    //     }
+    // }
+
     /**
      * Finds the "best" element containing the text, where "best" is roughly defined as "what the
      * user would click on if you told them to click on the text".
@@ -426,6 +436,7 @@ export class Driver {
             `//${tag}[text() = ${JSON.stringify(text)}]`,
             `//${tag}[starts-with(text(), ${JSON.stringify(text)})]`,
             `//${tag}[contains(text(), ${JSON.stringify(text)})]`,
+            `//${tag}[contains(., ${JSON.stringify(text)})]`,
         ]
 
         for (const query of queries) {
@@ -465,7 +476,7 @@ export class Driver {
     }
 }
 
-function modifyJSONC(text: string, path: jsonc.JSONPath, f: (oldValue: jsonc.Node | undefined) => any): any {
+export function modifyJSONC(text: string, path: jsonc.JSONPath, f: (oldValue: jsonc.Node | undefined) => any): any {
     const old = jsonc.findNodeAtLocation(jsonc.parseTree(text), path)
     return jsonc.applyEdits(
         text,

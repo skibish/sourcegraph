@@ -312,3 +312,12 @@ export function getManagementConsoleState(gqlClient: GraphQLClient): Promise<GQL
         )
         .toPromise()
 }
+
+// export function getCriticalConfig(
+//     gqlClient: GraphQLClient,
+//     managementConsoleUrl: string
+// ): Promise<{ ID: string; Contents: string }> {
+
+// }
+
+// export function setCriticalConfig(gqlClient: GraphQLClient, managementConsoleUrl: string): Promise<void> {}
